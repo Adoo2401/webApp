@@ -94,3 +94,9 @@ html,body,:root{
   animation: slideUpAndDown 3s ease-in-out infinite; /* 2s duration, ease-in-out timing function, and infinite loop */
   /* Other styles for the div */
 }
+
+
+.rti--container {
+  --rti-bg: "#111827" !important;
+  
+}

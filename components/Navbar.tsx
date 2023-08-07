@@ -5,10 +5,14 @@ import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react"
 
 const MobileSidebar = () => {
 
     const [isMounted, setIsMounted] = useState(false);
+    const { data: session, status } = useSession()
+
+    
 
     useEffect(() => {
         setIsMounted(true)
@@ -21,7 +25,7 @@ const MobileSidebar = () => {
     return (
         <Sheet>
             <SheetTrigger>
-                <Button variant={"ghost"} size={"icon"} className="md:hidden">
+                <Button variant={"ghost"} size={"icon"} className="md:hidden text-white">
                     <Menu />
                 </Button>
             </SheetTrigger>
