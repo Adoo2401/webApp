@@ -81,15 +81,25 @@ html,body,:root{
   }
 }
 
-@keyframes slideUpAndDown {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-80px); /* Adjust the value to control the distance of the movement */
+.arrow {
+  position: relative;
+  animation: moveArrow 2s linear infinite;
+}
+
+@keyframes moveRightAndLeft {
+  0%,100%{
+    transform: scale();
   }
 }
 
+@keyframes moveArrow {
+  0%, 100% {
+    left: 0;
+  }
+  50% {
+    left: 10px 
+  }
+}
 .animated-div {
   animation: slideUpAndDown 3s ease-in-out infinite; /* 2s duration, ease-in-out timing function, and infinite loop */
   /* Other styles for the div */

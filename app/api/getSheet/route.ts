@@ -1,6 +1,7 @@
 import {GoogleSpreadsheet} from 'google-spreadsheet'
 import { NextResponse } from 'next/server';
 import {JWT} from 'google-auth-library'
+import transformKeys from './Transform'
 
 
 
@@ -12,14 +13,20 @@ const serviceAccountAuth = new JWT({
     ],
   });
 
-export async function POST (req:Request,res:Response){
+export async function GET (req:Request,res:Response){
     try {
         
-        const body = await req.json();
-        let {googleSheetId,prefix,sheetId,apiKey,apiSecret} = body;
+        // const body = await req.json();
+
+        let googleSheetId = "1HVHygjcTubZLlubR5KESZMjQAXTKRsNDzFV_-GBBNwg" ; 
+        let prefix = "MyTestingOrder-0";
+        let sheetId=0
+        let apiKey="mwxoz6wlowff4nj7ijwz1kgqxrpddwnfwolcbn3t"
+        let apiSecret="apjgalnbmcl0ddvriula0rwqyci6xdmat49jiyak"; 
+        let product="Testing Product"
 
         
-        if(!googleSheetId || !prefix ||!apiKey || !apiSecret) { return NextResponse.json({success:false,message:"Enter all the fields"},{status:400}) };
+        // if(!googleSheetId || !prefix ||!apiKey || !apiSecret || !product) { return NextResponse.json({success:false,message:"Enter all the fields"},{status:400}) };
 
         let token : any = await fetch("https://api.codinafrica.com/api/users/apilogin",{method:"POST",body:JSON.stringify({key:apiKey,secret:apiSecret}),headers:{"Content-Type":"application/json"}});
         token = await token.json();
@@ -32,7 +39,7 @@ export async function POST (req:Request,res:Response){
 
         
         
-        const data = [];
+        let data = [];
 
         const pattern = /^(\D+)-(\d+)$/;
         const match = prefix.match(pattern);
@@ -43,13 +50,12 @@ export async function POST (req:Request,res:Response){
         let number : number  = 0;
         
         if (hyphenIndex !== -1) {
-          const numberString = prefix.slice(hyphenIndex + 1);
+          const numberString :any = prefix.slice(hyphenIndex + 1);
           if (!isNaN(numberString)) {
             number = parseInt(numberString);
           }
         }
 
-    
         const doc = new GoogleSpreadsheet(googleSheetId,serviceAccountAuth);
         await doc.loadInfo();
 
@@ -57,8 +63,7 @@ export async function POST (req:Request,res:Response){
         if(!sheet) { return NextResponse.json({success:false,message:"Sheet Not found please see that if you have written correct sheet Id"},{status:500}) }
         
         const rows = await sheet.getRows();
-        const headerValues = sheet.headerValues;
-
+        let headerValues : string[] = [...sheet.headerValues,"items","total"];
 
         if (hyphenIndex !== -1) {
           prefix = prefix.slice(0, hyphenIndex + 1);
@@ -71,33 +76,63 @@ export async function POST (req:Request,res:Response){
             const rowData : any = {};
         
             headerValues.forEach((header,index) => {
+                let totalPrice = 0;
                 if(header=="Order ID" || header=="order id" || header === "Order id" || header === "order Id" || header === "order ID"){
-                    rowData[header] = `${prefix}-${number+i}`;
-                }else{
-                    rowData[header] = row.get(header);
+                    rowData[header] = `${prefix}${number+i}`;
+                }
+
+                else if(header==="items"){
+                  rowData[header] = [
+                    {
+                      name:product,
+                      code:row.get("SKU"),
+                      quantity:parseInt(row.get("Total quantity")),
+                      price:parseInt(row.get("Total charge"))
+                    }
+                  ]
+                  
+                }
+            
+                else if (header==="Total charge" || header==="Total quantity" || header==="SKU") {
+                }
+
+                else{
+                  rowData[header] = row.get(header);
                 }
             });
         
             data.push(rowData);
         
         }
+
+        data = data.map(item=>{
+
+           let totalPrice =  item.items.reduce((acc:number,currentValue:any)=>{
+            return acc+currentValue.price
+           },0)
+
+           return {...transformKeys(item),total:totalPrice}
+
+        });
+
+        // data = data.map(item=>toCamelCase(item))
         
-        let API = await fetch("https://api.codinafrica.com/api/orders/apicreate",{method:"POST",headers:{"Content-Type":"application/json","x-auth-token":token},body:JSON.stringify({
-          orderId:"testingorderId",
-          source:"testingsournce",
-          fullName:"testingfullName",
-          phone:"433434",
-          country:"testingcountry",
-          city:"testingcity",
-          address:"testingaddress",
-          items:[{code:"testingcode"}],
-          total:1
-        })});
+        // let API = await fetch("https://api.codinafrica.com/api/orders/apicreate",{method:"POST",headers:{"Content-Type":"application/json","x-auth-token":token},body:JSON.stringify({
+        //   orderId:"testingorderId",
+        //   source:"testingsournce",
+        //   fullName:"testingfullName",
+        //   phone:"433434",
+        //   country:"testingcountry",
+        //   city:"testingcity",
+        //   address:"testingaddress",
+        //   items:[{code:"testingcode"}],
+        //   total:1
+        // })});
         
-        let order_id = await API.text();
+        // let order_id = await API.text();
 
   
-        return NextResponse.json({success:true,message:order_id},{status:200});
+        return NextResponse.json({success:true,message:data},{status:200});
         
 
     } catch (error:any) {

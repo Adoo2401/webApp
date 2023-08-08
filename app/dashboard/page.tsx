@@ -1,21 +1,18 @@
 "use client"
 
-
-import { FileSpreadsheet, Key, Lock, Sheet, ShoppingCart } from "lucide-react";
+import { FileSpreadsheet, Key, ListOrdered, Lock, Sheet, ShoppingCart } from "lucide-react";
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
-import { TagsInput } from 'react-tag-input-component'
-import { useTheme } from "next-themes";
 
 export default function Dashboard() {
 
   const codeInAfricaAPIKey = useRef(null);
-  const [products,setProducts] = useState([]);
+  const productName = useRef(null);
   const codeInAfricaSecretKey = useRef(null);
-  const {theme} = useTheme();
   const googleSheetId = useRef(null);
+  const orderIdPrefix = useRef(null);
   const sheetId = useRef(null);
 
   const inputs = [
@@ -56,16 +53,23 @@ export default function Dashboard() {
       ref: sheetId
     },
     {
-      placeHolder: "Product Names",
+      placeHolder: "Product Name",
       icon: ShoppingCart,
       bgColor: "rgba(139, 92, 246,0.1)",
       color: "#c2410c",
       label: "Product Names",
-      description: "Add your Product Names that are registerd in code in africa dashboard",
-      ref: sheetId,
-      render: () => {
-        return <TagsInput value={products} placeHolder="Enter Product Names"  classNames={{tag:`${theme=="dark" || theme=="system"?"bg-white text-black":"bg-red-500"}`,input:`${theme==="dark" || theme==="system" ?"bg-[#020817] text-white":""}`}} />
-      }
+      description: "Add your Product Name that is registerd in code in africa dashboard",
+      ref:productName
+    },
+    {
+      placeHolder: "Order ID Prefix",
+      icon: ListOrdered,
+      bgColor: "rgba(139, 92, 246,0.1)",
+      color: "#c2410c",
+      label: "Order ID Prefix",
+      description: "Add your Order ID prefix in formate of order-7",
+      ref: orderIdPrefix,
+      
     },
 
   ]
@@ -97,7 +101,7 @@ export default function Dashboard() {
             </div>
             <p className="md:text-sm w-full text-xs mt-5 break-words text-muted-foreground text-center leading-5">{input.description}</p>
             <div className="mt-4">
-              {input.render ? input.render() : <Input ref={input.ref} required placeholder={input.placeHolder} />}
+               <Input ref={input.ref} required placeholder={input.placeHolder} />
             </div>
           </Card>
         ))}

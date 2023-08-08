@@ -5,7 +5,8 @@ import { Montserrat } from "next/font/google"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from 'next/navigation'
-import { CircleDashed, SquareDashedBottom } from "lucide-react";
+import { CircleDashed} from "lucide-react";
+import {useTheme} from 'next-themes'
 
 
 const monterrat = Montserrat({ weight: "600", subsets: ["latin"] });
@@ -13,6 +14,7 @@ const routes = [
     { href: "/dashboard", color: "#0ea5e9", label: "Dashboard", icon: CircleDashed },
     { href: "/ddf", color: "#0ea5e9", label: "Dashboard", icon: CircleDashed },
 ]
+
 
 const Sidebar = () => {
 
