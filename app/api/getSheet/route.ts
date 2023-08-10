@@ -13,6 +13,9 @@ const serviceAccountAuth = new JWT({
 
 export async function POST (req:Request,res:Response){
     try {
+
+        const userId = req.headers.get("Authorization");   
+        if(!userId) {return NextResponse.json({success:false,message:"Unauthorized Request"},{status:401})}
         
         const body = await req.json();
 

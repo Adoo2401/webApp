@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import Loader from "@/components/Loader";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 

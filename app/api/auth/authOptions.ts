@@ -12,7 +12,6 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email" },
         password: { label: "Password" },
-        name:{label:"Name"}
       },
       
       
@@ -34,5 +33,27 @@ export const authOptions: NextAuthOptions = {
   pages:{
     signIn:"/login",
   },
+
+  callbacks:{
+
+    async jwt({token,user}:{token:any,user:any}){
+      if(user) {
+        token.role=user.role
+        token.plan=user.plan
+        token.id = user._id
+      }
+      return token
+    },
+
+    async session({session,token}:{session:any,token:any}){
+      if(session?.user) { 
+        session.user.role= token.role
+        session.user.plan=token.plan
+        session.user.id = token._id
+      }
+      return session
+    }
+
+  }
 
 };
