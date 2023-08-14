@@ -18,7 +18,7 @@ export async function POST (req:NextRequest,res:Response){
     try {
 
       
-        const accessToken = req?.cookies?.get(process.env.NODE_ENV==="development"?"next-auth.session-token":"__Secure-next-auth.session-token")?.value 
+        const accessToken = req?.cookies?.get(process.env.COOKIE_NAME!)?.value 
         if(!accessToken){return NextResponse.json({success:false,message:"Unathorized Request"},{status:401})};
         
         const requestedUser = await decode({secret:process.env.NEXTAUTH_SECRET!,token:accessToken});

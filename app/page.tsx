@@ -10,18 +10,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen min-w-screen bg-[#37517E] p-10">
       <div className="md:container md:mx-auto">
-        {/* <div className="flex justify-between items-center"> */}
-          {/* <div>
-            <h1 className="text-4xl text-white">LOGO</h1>
-          </div> */}
           <Navbar isHome={true}/>
-          {/* <div className="md:flex space-x-5 hidden text-white">
-            <Link href={"/pricing"}>Pricing</Link>
-            <Link href={"/contact"}>Contact Us</Link>
-            <Link href={"/about"}>About Us</Link>
-          </div> */}
-        {/* </div> */}
-
         <div className="grid  items-center md:grid-cols-2 mt-[40px] md:mt-[70px]">
           <div className="order-2 md:order-1">
             <h1 className="font-bold text-white md:text-6xl text-4xl">

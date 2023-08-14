@@ -19,10 +19,10 @@ export async function POST(req:NextRequest){
         const {id:userId} : any = requestedUser
         
         const body = await req.json();
-        const {stripePriceId,planName} = body;
+        const {stripePriceId} = body;
         
         
-        const homeSuccessUrl = absoluteUrl(`/?success=true&plan=${planName}`);
+        const homeSuccessUrl = absoluteUrl(`/?success=true`);
         const homeErrorUrl = absoluteUrl("/?success=false");
 
 
@@ -39,6 +39,7 @@ export async function POST(req:NextRequest){
                 return_url:homeSuccessUrl
             })
 
+            
             return NextResponse.json({success:true,message:stripeSession.url});
         }
 
