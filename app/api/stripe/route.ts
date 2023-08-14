@@ -10,8 +10,9 @@ import { decode } from 'next-auth/jwt';
 export async function POST(req:NextRequest){
     try {
 
-        const accessToken = req?.cookies?.get("__Secure-next-auth.session-token")?.value 
-        console.log(accessToken);
+        
+        const accessToken = req?.cookies?.get(process.env.COOKIE_NAME!)?.value 
+        
         if(!accessToken){return NextResponse.json({success:false,message:"Unathorized Request"},{status:401})};
 
         const requestedUser = await decode({secret:process.env.NEXTAUTH_SECRET!,token:accessToken});
