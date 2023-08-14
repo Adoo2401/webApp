@@ -10,7 +10,7 @@ const page = async () => {
 
   return (
     <>
-     <Navbar/>
+     <Navbar isHome={false}/>
      <RegisterComponent/>
     </>
   )
