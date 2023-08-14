@@ -1,43 +1,58 @@
-"use client"
+import Link from 'next/link'
+import React from 'react'
+import MobileSidebar from './MobileNavbar'
+import { cn } from '@/lib/utils'
+import { getServerSession } from 'next-auth'
+import { ArrowBigRight } from 'lucide-react'
 
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useSession } from "next-auth/react"
+const Navbar = async ({ isHome }: { isHome: boolean }) => {
 
-const MobileSidebar = () => {
+  const session = await getServerSession();
+  
 
-    const [isMounted, setIsMounted] = useState(false);
-    const { data: session, status } = useSession()
+  return (
+    <div className='md:container md:mx-auto p-10'>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className={cn("text-4xl text-white", !isHome ? "text-black" : "text-white")}>LOGO</h1>
+        </div>
+        <MobileSidebar isHome={isHome} />
+        <div className={cn("md:flex items-center space-x-5 hidden text-red",isHome?"text-white":"text-black")}>
+          <Link href={"/pricing"}>Pricing</Link>
+          <Link href={"/contact"}>Contact Us</Link>
+          <Link href={"/about"}>About Us</Link>
+          {
+           
+            !isHome ? session?.user ?  (
+              <Link
+                href="/dashboard"
+                className="bg-[#4F46E5] hover:text-[#4F46E5] cursor-pointer flex space-x-2 text-white rounded-full px-10 py-2 hover:bg-transparent transition duration-500"
+              >
+                <button className="">Dashboard</button>{" "}
+                <ArrowBigRight className="arrow" />
+              </Link>
+            ): (
+              <>
+                <Link href="/login">
+                  <button className="bg-[#4F46E5] text-white rounded-full px-10 py-2 hover:bg-transparent hover:text-[#4F46E5] transition duration-500">
+                    Log In
+                  </button>
+                </Link>
+                <Link href="/register">
+                  <button className="border text-[#4F46E5] hover:text-white border-[#4F46E5] hover:bg-[#4F46E5] transition duration-500 rounded-full px-10 py-2">
+                    Register
+                  </button>
+                </Link>
+              </>
+            ) : (
+              <></>
+            )
+          }
 
-    
+        </div>
+      </div>
+    </div>
+  )
+}
 
-    useEffect(() => {
-        setIsMounted(true)
-    }, [])
-
-    if (!isMounted) {
-        return null
-    }
-
-    return (
-        <Sheet>
-            <SheetTrigger>
-                <Button variant={"ghost"} size={"icon"} className="md:hidden text-white">
-                    <Menu />
-                </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="p-0">
-                <div className="flex space-y-5 flex-col items-center mt-10 ">
-                    <Link href={"/pricing"}>Pricing</Link>
-                    <Link href={"/contact"}>Contact Us</Link>
-                    <Link href={"/about"}>About Us</Link>
-                </div>
-            </SheetContent>
-        </Sheet>
-    );
-};
-
-export default MobileSidebar;
+export default Navbar

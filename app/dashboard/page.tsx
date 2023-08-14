@@ -4,20 +4,24 @@ import { FileSpreadsheet, Key, ListOrdered, Loader2, Lock, Sheet, ShoppingCart }
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
 
 export default function Dashboard() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
+
   const [codeInAfricaAPIKey, setCodeInAfricaAPIKey] = useState("");
+  const searchParams = useSearchParams();
   const [productName, setProductName] = useState("");
   const [codeInAfricaSecretKey, setCodeInAfricaSecretKey] = useState("");
   const [googleSheetId, setGoogleSheetId] = useState("");
   const [orderIdPrefix, setOrderIdPrefix] = useState("");
   const [sheetId, setSheetId] = useState("");
+  
 
   const inputs = [
     {
@@ -81,6 +85,7 @@ export default function Dashboard() {
       setter: setOrderIdPrefix,
     },
   ];
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

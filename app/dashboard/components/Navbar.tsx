@@ -9,7 +9,7 @@ const Navbar = () => {
 
    const {data:session,status} = useSession();
    const [firstName, lastName] = session?.user?.name?.split(' ') || []
-
+   
    if(status!=="authenticated") {return}
 
   return (
@@ -17,7 +17,7 @@ const Navbar = () => {
       <MobileSidebar />
       <div className="flex w-full justify-end space-x-5">
         <Avatar className="cursor-pointer">
-          <AvatarImage src={session?.user?.image as undefined} />
+          <AvatarImage src={session?.user?.image} />
           <AvatarFallback className="uppercase">{firstName.charAt(0)}{lastName.charAt(0)}</AvatarFallback>
         </Avatar>
         <Theme/>

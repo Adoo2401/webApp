@@ -36,20 +36,27 @@ export const authOptions: NextAuthOptions = {
 
   callbacks:{
 
-    async jwt({token,user}:{token:any,user:any}){
+    async jwt({token,user,trigger,session,account}){
+      
+      if(trigger==="update"){
+        return {...token,...session.user}
+      }
+
       if(user) {
         token.role=user.role
-        token.plan=user.plan
-        token.id = user._id
+        token.plan=user.plan 
+        token.id = user._id 
       }
+      
       return token
     },
 
-    async session({session,token}:{session:any,token:any}){
+    async session({session,token}){
       if(session?.user) { 
         session.user.role= token.role
         session.user.plan=token.plan
-        session.user.id = token._id
+        session.user.id = token.id
+        
       }
       return session
     }
