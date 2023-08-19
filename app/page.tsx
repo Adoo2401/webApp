@@ -46,8 +46,9 @@ export default async function Home() {
           </div>
 
           <div className="relative md:order-2 order-1 md:h-[500px] animated-div h-[300px]">
-            <Image alt="logo" fill src="/hero-img.png" layout="fill" />
-          </div>
+            
+            <Image alt="logo"  fill src="/hero-img.png" layout="fill" objectFit="contain" />
+        </div>
         </div>
       </div>
     </div>

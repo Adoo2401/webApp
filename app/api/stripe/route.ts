@@ -19,8 +19,8 @@ export async function POST(req:NextRequest){
         const {id:userId} : any = requestedUser
         
         const body = await req.json();
-        const {stripePriceId} = body;
-        
+        const {stripePriceId,trialPeriod} = body;
+        console.log(trialPeriod);
         
         const homeSuccessUrl = absoluteUrl(`/?success=true`);
         const homeErrorUrl = absoluteUrl("/?success=false");
@@ -43,6 +43,7 @@ export async function POST(req:NextRequest){
             return NextResponse.json({success:true,message:stripeSession.url});
         }
 
+
         const stripeSession = await stripe.checkout.sessions.create({
             success_url:homeSuccessUrl,
             cancel_url:homeErrorUrl,
@@ -60,7 +61,7 @@ export async function POST(req:NextRequest){
                 userId:userId
             },
             subscription_data:{
-                trial_period_days:7,
+                trial_period_days:trialPeriod,
             }
         })
         

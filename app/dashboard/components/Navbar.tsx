@@ -8,6 +8,7 @@ import {useSession } from "next-auth/react"
 const Navbar = () => {
 
    const {data:session,status} = useSession();
+   console.log(session);
    const [firstName, lastName] = session?.user?.name?.split(' ') || []
    
    if(status!=="authenticated") {return}
@@ -18,7 +19,7 @@ const Navbar = () => {
       <div className="flex w-full justify-end space-x-5">
         <Avatar className="cursor-pointer">
           <AvatarImage src={session?.user?.image} />
-          <AvatarFallback className="uppercase">{firstName.charAt(0)}{lastName.charAt(0)}</AvatarFallback>
+          <AvatarFallback className="uppercase">{firstName?.charAt(0)}{lastName?.charAt(0)}</AvatarFallback>
         </Avatar>
         <Theme/>
       </div>

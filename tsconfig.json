@@ -23,7 +23,7 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/loading.js", "app/api/webhook/route.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/loading.js", "app/api/webhook/route.js", "app/(admin)/admin/(routes)/stripe/edit_price/[...id]/page.jsx"],
   "exclude": ["node_modules"]
 }
 

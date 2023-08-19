@@ -4,17 +4,8 @@ import {stripe} from '../lib/stripe'
 import { NextResponse } from 'next/server';
 import User from '../models/User';
 import mongoose from 'mongoose';
+import Product from '../models/Product';
 
-function chosenTier(priceId){
-
-    if (priceId === process.env.NEXT_PUBLIC_STRIPE_BASIC_PLAN_API_KEY) {
-        return "basic";
-    } else if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRO_PLAN_API_KEY) {
-        return "pro";
-    } else if (priceId === process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PLAN_API_KEY) {
-        return "premium";
-    }
-}
 
 export async function POST(req){
 
@@ -26,13 +17,15 @@ export async function POST(req){
     try {
         event = stripe.webhooks.constructEvent(body,signature,process.env.STRIPE_WEBHOOK_SECRET);
     } catch (error) {
-        
+        console.log(error);
         return NextResponse.json({success:false,message:`Webhook Error ___ ${error.message}`},{status:400})
     }
-    
 
+    
     try {
+        
         mongoose.connect(process.env.MONGODB_URL);
+        
         const session = event.data.object
     
 
@@ -44,7 +37,17 @@ export async function POST(req){
             return NextResponse.json({success:false,message:"User not found"},{status:400})
         }
 
-        await User.findByIdAndUpdate(session.metadata.userId,{stripeCustomerId:subscription.customer,stripeSubscriptionId:subscription.id,stripePriceId:subscription.items.data[0].plan.id,stripeCurrentPeriodEnd:new Date(subscription.current_period_end * 1000),plan:chosenTier(subscription.items.data[0].plan.id)})
+        let chosenTier = await Product.findOne({
+            prices:{
+                $elemMatch:{
+                    priceId:subscription.items.data[0].plan.id
+                }
+            }
+        })
+        console.log(subscription.items.data[0].plan.id);
+        console.log(chosenTier);
+
+        await User.findByIdAndUpdate(session.metadata.userId,{stripeCustomerId:subscription.customer,stripeSubscriptionId:subscription.id,stripePriceId:subscription.items.data[0].plan.id,stripeCurrentPeriodEnd:new Date(subscription.current_period_end * 1000),plan:chosenTier.name})
     }
 
     if(event.type=="customer.subscription.updated"){

@@ -31,17 +31,17 @@ export async function POST (req:NextRequest,res:Response){
         
         let {googleSheetId,prefix,apiKey,apiSecret,product,sheetId} = body 
         
-        await User.findByIdAndUpdate(userId,{codeInAfricaApiKey:apiKey,codeInAfricaSecretKey:apiSecret},{new:true})
-
+        
         if(!googleSheetId || !prefix ||!apiKey || !apiSecret || !product ) { return NextResponse.json({success:false,message:"Enter all the fields"},{status:400}) };
-
+        
         let token : any = await fetch("https://api.codinafrica.com/api/users/apilogin",{method:"POST",body:JSON.stringify({key:apiKey,secret:apiSecret}),headers:{"Content-Type":"application/json"}});
         token = await token.json();
         
         if(!token?.content?.token){
-            return NextResponse.json({success:false,message:"Something went wrong while fetching token or Invalid code of africa API key or Secret make sure you enter correct"},{status:400})
+          return NextResponse.json({success:false,message:"Something went wrong while fetching token or Invalid code of africa API key or Secret make sure you enter correct"},{status:400})
         }
-
+        
+        await User.findByIdAndUpdate(userId,{codeInAfricaApiKey:apiKey,codeInAfricaSecretKey:apiSecret},{new:true})
         token = token.content.token;
 
         let data = [];

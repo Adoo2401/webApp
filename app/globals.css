@@ -110,3 +110,26 @@ html,body,:root{
   --rti-bg: "#111827" !important;
   
 }
+
+
+
+.ReactTags__tagInput{
+  padding-bottom: 5px;
+  padding-top: 3px;
+  outline: none;
+  margin-top: 20px;}
+
+.ReactTags__tagInput > input{
+  background-color: inherit;
+  width: 100%;
+}
+
+.ReactTags__tagInput > input:focus{
+  outline: none;
+  border: none;
+}
+
+.ReactTags__selected .ReactTags__tag{
+  margin-left: 15px;
+  font-size: 14px;
+}

@@ -34,18 +34,14 @@ const MobileSidebar = ({isHome}:{isHome:boolean}) => {
 
             if (message == 'true') {
 
+                 toast({ title: "Subscription Created", description: <div className="flex space-x-2"><p>Plese Wait while we redirect you to your dasbhoard</p><Loader className="animate-spin" /></div>, className: "bg-green-500 text-white" ,duration:3000});
                  let API : any = await fetch("/api/userPlan");
                  API = await API.json();
 
                  if(API.success){
 
-                  await update({ ...session, user: { ...session?.user, plan:API.message.plan } })
-                
-                  toast({ title: "Subscription Created", description: <div className="flex space-x-2"><p>Plese Wait while we redirect you to your dasbhoard</p><Loader className="animate-spin" /></div>, className: "bg-green-500 text-white" ,duration:3000});
-                  setTimeout(()=>{
-                    router.push("/dashboard")
-                  },2000)
-                  return
+                 let s =await update({ ...session, user: { ...session?.user, plan:API.message } })
+                 return router.push("/dashboard");
 
                  }
 
