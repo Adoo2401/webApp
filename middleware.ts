@@ -1,9 +1,10 @@
+
 import { withAuth, NextRequestWithAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
-import schedule from "node-schedule";
+
 
 export default withAuth(
-  function middleware(request: NextRequestWithAuth) {
+    function middleware(request: NextRequestWithAuth) {
 
     let parts: any = request.nextUrl.pathname.split("/");
 
@@ -16,10 +17,6 @@ export default withAuth(
       request.nextauth.token?.plan === "none"
     ) {
       return NextResponse.redirect(new URL("/pricing", request.url));
-    }
-
-    if (request.nextUrl.pathname.startsWith("/")) {
-      // schedule.scheduleJob('* * * * * *', () => console.log("i am working")); // Every second
     }
 
     if (

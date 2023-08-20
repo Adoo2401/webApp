@@ -121,6 +121,8 @@ export default function Dashboard() {
      setIsLoading(false);
 
     } catch (error) {
+      console.log(error);
+      setIsLoading(false);
       toast({ title: "Error", description: "An error occurred during API call", variant: "destructive" });
     } 
   };

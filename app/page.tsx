@@ -1,3 +1,4 @@
+
 import { ArrowBigRight, Menu } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -5,7 +6,12 @@ import { getServerSession } from "next-auth";
 import Navbar from "@/components/Navbar";
 
 export default async function Home() {
+
   const session = await getServerSession();
+
+  const scheduler = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/scheduler`);
+  const schedulerData = await scheduler.json();
+  console.log("🚀 ~ file: page.tsx:14 ~ Home ~ schedulerData:", schedulerData)
 
   return (
     <div className="min-h-screen min-w-screen bg-[#37517E] p-10">

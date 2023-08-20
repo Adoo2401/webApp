@@ -20,7 +20,6 @@ export async function POST(req:NextRequest){
         
         const body = await req.json();
         const {stripePriceId,trialPeriod} = body;
-        console.log(trialPeriod);
         
         const homeSuccessUrl = absoluteUrl(`/?success=true`);
         const homeErrorUrl = absoluteUrl("/?success=false");

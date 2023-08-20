@@ -20,9 +20,9 @@ const productSchema = new mongoose.Schema({
       active:{type:Boolean,default:true},
     },
   ],
+  cronJobTiming:String,
 });
 
-const Product =
-  mongoose.models.product || mongoose.model("product", productSchema);
+const Product = mongoose?.models?.product || mongoose.model("product", productSchema);
 
 export default Product;

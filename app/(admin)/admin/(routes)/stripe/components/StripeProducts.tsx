@@ -5,12 +5,10 @@ import { ColumnDef } from "@tanstack/react-table"
 import { DataTable } from '@/components/ui/DataTable'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button'
-import { Delete, DeleteIcon, Loader, MoreHorizontal } from 'lucide-react'
+import { Loader, MoreHorizontal } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
-import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
-import { Input } from '@/components/ui/input'
 import {
     Table,
     TableBody,
@@ -22,7 +20,6 @@ import {
 } from "@/components/ui/table"
 
 
-import { Label } from '@radix-ui/react-dropdown-menu'
 import { useRouter } from 'next/navigation'
 
 type Payment = {

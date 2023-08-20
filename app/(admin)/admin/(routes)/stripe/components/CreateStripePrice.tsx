@@ -26,7 +26,7 @@ function EditStripePrice() {
     const [isTrial, setIsTrial] = useState(false);
     const [isProductLoading, setIsProductLoading] = useState(true);
     const { toast } = useToast();
-    const [data, setData] = useState({ features:tags,trial: "", currency: "", unit_amount: 0, interval: "month", product: "" })
+    const [data, setData] = useState({ features:tags,trial: "", currency: "", unit_amount:"", interval: "month", product: "" })
 
     useEffect(()=>{
         setData({...data,features:tags})

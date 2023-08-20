@@ -1,21 +1,5 @@
-import { Code, User2 , LayoutDashboard, DollarSign ,MusicIcon, Settings, CircleDollarSign } from "lucide-react";
+import { Code, User2 , LayoutDashboard, DollarSign ,MusicIcon, Settings, CircleDollarSign, Timer } from "lucide-react";
 
-export const payments = [
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-    },
-    {
-      id: "489e1d42",
-      amount: 125,
-      status: "processing",
-      email: "example@gmail.com",
-    },
-    // ...
-  ]
-  
 
 const routes = [
     {
@@ -43,9 +27,9 @@ const routes = [
         color:"#c2410c"
     },
     {
-        label:"Music Generation",
-        icon:MusicIcon,
-        href:"/admin/music",
+        label:"Cron Jobs",
+        icon:Timer,
+        href:"/admin/cron_jobs",
         color:"#10b981"
     },
     {
