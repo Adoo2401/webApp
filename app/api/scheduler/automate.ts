@@ -5,7 +5,7 @@ import { GoogleSpreadsheet } from 'google-spreadsheet'
 import Sheet from "../models/Sheet";
 
 
-const delay = (ms:number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function automate(plan: string) {
     console.log("Automation Started");
@@ -31,28 +31,35 @@ async function automate(plan: string) {
                         const doc = new GoogleSpreadsheet(userAddedSheets[j].googleSheetId, serviceAccountAuth);
 
                         await doc.loadInfo()
-                        
+
                         let offset = 0;
                         offset = (await Sheet.find({ userId: users[i]._id, googleSheetId: userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId })).length;
                         console.log("🚀 ~ file: automate.ts:37 ~ automate ~ offset:", offset)
 
-                        let highestOrderPrefix = await Sheet.aggregate([
+                        const highestOrderPrefix = await Sheet.aggregate([
                             {
-                                $match: {
-                                    orderId: { $regex: /^\w+-\w+-\d+$/ }
+                                $project: {
+                                    orderId: 1,
+                                    items:1,
+                                    numericPart: {
+                                        $toInt: {
+                                            $arrayElemAt: [{ $split: ["$orderId", "-"] }, -1]
+                                        }
+                                    }
                                 }
                             },
                             {
-                                $sort: {
-                                    orderId: -1
-                                }
+                                $sort: { numericPart: -1 }
                             },
                             {
                                 $limit: 1
                             }
                         ]);
 
+                        console.log("🚀 ~ file: automate.ts:59 ~ automate ~ highestOrderPrefix:", highestOrderPrefix)
+
                         let prefix = highestOrderPrefix[0].orderId
+                        console.log("🚀 ~ file: automate.ts:56 ~ automate ~ prefix:", prefix)
                         let items = highestOrderPrefix[0].items;
 
                         const [store, orderCountry, number] = prefix.split("-")
@@ -62,18 +69,18 @@ async function automate(plan: string) {
 
                         const rows = await sheet.getRows({ offset });
                         console.log("🚀 ~ file: automate.ts:64 ~ automate ~ rows:", rows)
-                       
+
 
                         let k = parseInt(number);
-                        let data :any = [];
-                        
+                        let data: any = [];
+
                         for (const row of rows) {
                             console.log("🚀 ~ file: automate.ts:71 ~ automate ~ row:", row)
-                            
 
-                            k = k+1
+
+                            k = k + 1
                             const rowData: any = {};
-                            
+
                             rowData["orderId"] = row.get("order id") || row.get("Order ID") || row.get("order Id") || row.get("orderId") || row.get("OrderId");
                             rowData["orderId"] = `${store}-${orderCountry}-${k}`
 
@@ -103,11 +110,11 @@ async function automate(plan: string) {
 
                             data.push({ ...rowData, userId: users[i]._id, googleSheetId: userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId });
                             console.log("🚀 ~ file: automate.ts:72 ~ automate ~ rowData:", rowData)
-                            
+
                         }
-                        
+
                         console.log("🚀 ~ file: automate.ts:66 ~ automate ~ data:", data)
-                      
+
                           const promises = data.map(async (object:any) => {
                            const response = await fetch("https://api.codinafrica.com/api/orders/apicreate",{method:"POST",headers:{"Content-Type":"application/json;charset=utf-8","x-auth-token":token?.content.token},body:JSON.stringify(object)});
                            return response.text();
@@ -116,7 +123,10 @@ async function automate(plan: string) {
                         await Promise.all(promises);
                         await Sheet.insertMany(data);
 
-                    } catch (error:any) {
+                        await delay(4000);
+                        console.log("After 4seconds next loop works");
+
+                    } catch (error: any) {
                         console.log(error + "second loop");
                         continue;
                     }
