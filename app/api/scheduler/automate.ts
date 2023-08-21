@@ -28,7 +28,6 @@ async function automate(plan: string) {
                 for (let j = 0; j < userAddedSheets.length; j++) {
 
                     try {
-                        await delay(30000)
                         const doc = new GoogleSpreadsheet(userAddedSheets[j].googleSheetId, serviceAccountAuth);
 
                         await doc.loadInfo()
@@ -123,7 +122,6 @@ async function automate(plan: string) {
                         continue;
                     }
 
-                    await delay(30000)
                 }
 
             } else {
