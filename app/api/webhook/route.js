@@ -44,8 +44,7 @@ export async function POST(req){
                 }
             }
         })
-        console.log(subscription.items.data[0].plan.id);
-        console.log(chosenTier);
+        
 
         await User.findByIdAndUpdate(session.metadata.userId,{stripeCustomerId:subscription.customer,stripeSubscriptionId:subscription.id,stripePriceId:subscription.items.data[0].plan.id,stripeCurrentPeriodEnd:new Date(subscription.current_period_end * 1000),plan:chosenTier.name})
     }
@@ -57,10 +56,19 @@ export async function POST(req){
        
         const subscription = await stripe.subscriptions.retrieve(id)
 
+        let chosenTier = await Product.findOne({
+            prices:{
+                $elemMatch:{
+                    priceId:subscription.items.data[0].plan.id
+                }
+            }
+        })
+        
+
         await User.updateOne({stripeSubscriptionId:subscription.id},{
             stripePriceId:subscription.items.data[0].plan.id,
             stripeCurrentPeriodEnd:new Date(subscription.current_period_end * 1000),
-            plan:subscription?.plan?.active?chosenTier(subscription.plan.id):"none",
+            plan:subscription?.plan?.active?chosenTier.name:"none",
 
         })
     }
@@ -83,12 +91,20 @@ export async function POST(req){
         const id = subscriptionDetails.subscription 
         
         const subscription = await stripe.subscriptions.retrieve(id)
+
+        let chosenTier = await Product.findOne({
+            prices:{
+                $elemMatch:{
+                    priceId:subscription.items.data[0].plan.id
+                }
+            }
+        })
       
         
         await User.updateOne({stripeSubscriptionId:subscription.id},{
             stripePriceId:subscription.items.data[0].plan.id,
             stripeCurrentPeriodEnd:new Date(subscription.current_period_end * 1000),
-            plan:chosenTier(subscription.items.data[0].plan.id),
+            plan:chosenTier.name,
 
         })
 

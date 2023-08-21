@@ -5,9 +5,7 @@ import mongoose from "mongoose";
 export async function GET (req:NextRequest){
     try {
 
-        const accessToken = req?.cookies?.get(process.env.COOKIE_NAME!)?.value  
-        if(!accessToken){return NextResponse.json({success:false,message:"Unathorized Request"},{status:401})};
-
+    
         await mongoose.connect(process.env.MONGODB_URL!);
 
         let productsNames = await Product.find()
