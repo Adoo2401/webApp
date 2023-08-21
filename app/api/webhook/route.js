@@ -59,12 +59,11 @@ export async function POST(req){
         let chosenTier = await Product.findOne({
             prices:{
                 $elemMatch:{
-                    priceId:subscription.items.data[0].plan.id
+                    priceId:subscription.plan.id
                 }
             }
         })
         
-
         await User.updateOne({stripeSubscriptionId:subscription.id},{
             stripePriceId:subscription.items.data[0].plan.id,
             stripeCurrentPeriodEnd:new Date(subscription.current_period_end * 1000),
@@ -95,10 +94,11 @@ export async function POST(req){
         let chosenTier = await Product.findOne({
             prices:{
                 $elemMatch:{
-                    priceId:subscription.items.data[0].plan.id
+                    priceId:subscription.plan.id
                 }
             }
         })
+        console.log("🚀 ~ file: route.js:104 ~ POST ~ chosenTier:", chosenTier)
       
         
         await User.updateOne({stripeSubscriptionId:subscription.id},{

@@ -4,7 +4,7 @@ import Product from "@/app/api/models/Product";
 import mongoose from "mongoose";
 import automate from "./automate";
 
-export async function GET(req: NextRequest) {
+export async function GET(request: Request) {
 
   try {
     
