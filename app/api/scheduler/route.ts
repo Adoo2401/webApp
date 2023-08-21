@@ -5,15 +5,9 @@ import mongoose from "mongoose";
 import automate from "./automate";
 
 export async function GET(req: NextRequest) {
-  let schedulerStarted = process.env.SCHEDULER_STARTED!;
-  console.log(
-    "🚀 ~ file: route.ts:9 ~ GET ~ schedulerStarted:",
-    schedulerStarted
-  );
-  let flag = false;
 
   try {
-    if (schedulerStarted=="false" && flag == false) {
+    
       await mongoose.connect(process.env.MONGODB_URL!);
       let products = await Product.find();
 
@@ -24,9 +18,7 @@ export async function GET(req: NextRequest) {
           continue;
         }
       }
-    }
-
-
+    
     return NextResponse.json({ success: true, message: "recieved" });
   } catch (error: any) {
     return NextResponse.json(
