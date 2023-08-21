@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
       flag = true;
       await mongoose.connect(process.env.MONGODB_URL!);
       let products = await Product.find();
+      console.log(products);
 
       for (let i = 0; i < products.length; i++) {
         if (products[i].cronJobTiming) {
