@@ -16,18 +16,31 @@ async function automate(plan: string) {
         try {
             if (users[i].codeInAfricaApiKey && users[i].codeInAfricaSecretKey) {
 
-                let token: any = await fetch("https://api.codinafrica.com/api/users/apilogin", { method: "POST", body: JSON.stringify({ key: users[i].codeInAfricaApiKey, secret: users[i].codeInAfricaSecretKey }), headers: { "Content-Type": "application/json" } });
-                token = await token.json();
-
-                if (!token?.content?.token) {
-                    continue
-                }
-
                 let userAddedSheets = await Sheet.find({ userId: users[i]._id });
 
                 for (let j = 0; j < userAddedSheets.length; j++) {
 
+
                     try {
+                        let currentGoogleSheetID = userAddedSheets[j].googleSheetId;
+                        let currentSheetID = userAddedSheets[j].sheetId;
+                        let currentUserID = users[i]._id;
+
+                        if (
+                            userAddedSheets[j + 1]?.googleSheetId === currentGoogleSheetID &&
+                            userAddedSheets[j + 1]?.sheetId === currentSheetID &&
+                            users[i]?._id === currentUserID
+                        ) {
+                            continue;
+                        }
+
+                        let token: any = await fetch("https://api.codinafrica.com/api/users/apilogin", { cache:"no-store",method: "POST", body: JSON.stringify({ key: users[i].codeInAfricaApiKey, secret: users[i].codeInAfricaSecretKey }), headers: { "Content-Type": "application/json" } });
+                        token = await token.json();
+
+                        if (!token?.content?.token) {
+                            continue
+                        }
+
                         const doc = new GoogleSpreadsheet(userAddedSheets[j].googleSheetId, serviceAccountAuth);
 
                         await doc.loadInfo()
@@ -40,7 +53,7 @@ async function automate(plan: string) {
                             {
                                 $project: {
                                     orderId: 1,
-                                    items:1,
+                                    items: 1,
                                     numericPart: {
                                         $toInt: {
                                             $arrayElemAt: [{ $split: ["$orderId", "-"] }, -1]
@@ -56,10 +69,8 @@ async function automate(plan: string) {
                             }
                         ]);
 
-                        console.log("🚀 ~ file: automate.ts:59 ~ automate ~ highestOrderPrefix:", highestOrderPrefix)
 
                         let prefix = highestOrderPrefix[0].orderId
-                        console.log("🚀 ~ file: automate.ts:56 ~ automate ~ prefix:", prefix)
                         let items = highestOrderPrefix[0].items;
 
                         const [store, orderCountry, number] = prefix.split("-")
@@ -68,14 +79,13 @@ async function automate(plan: string) {
                         if (!sheet) { continue }
 
                         const rows = await sheet.getRows({ offset });
-                        console.log("🚀 ~ file: automate.ts:64 ~ automate ~ rows:", rows)
 
 
                         let k = parseInt(number);
                         let data: any = [];
 
                         for (const row of rows) {
-                            console.log("🚀 ~ file: automate.ts:71 ~ automate ~ row:", row)
+
 
 
                             k = k + 1
@@ -109,22 +119,18 @@ async function automate(plan: string) {
 
 
                             data.push({ ...rowData, userId: users[i]._id, googleSheetId: userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId });
-                            console.log("🚀 ~ file: automate.ts:72 ~ automate ~ rowData:", rowData)
 
                         }
+                        console.log(token.content.token);
 
-                        console.log("🚀 ~ file: automate.ts:66 ~ automate ~ data:", data)
+                        const promises = data.map(async (object: any) => {
+                            const response = await fetch("https://api.codinafrica.com/api/orders/apicreate", { cache:"no-store",method: "POST", headers: { "Content-Type": "application/json;charset=utf-8", "x-auth-token": token.content.token }, body: JSON.stringify(object) });
+                            return response.text();
+                        });
 
-                          const promises = data.map(async (object:any) => {
-                           const response = await fetch("https://api.codinafrica.com/api/orders/apicreate",{method:"POST",headers:{"Content-Type":"application/json;charset=utf-8","x-auth-token":token?.content.token},body:JSON.stringify(object)});
-                           return response.text();
-                          });
-
-                        await Promise.all(promises);
+                        let results = await Promise.all(promises);
+                        console.log(results);
                         await Sheet.insertMany(data);
-
-                        await delay(4000);
-                        console.log("After 4seconds next loop works");
 
                     } catch (error: any) {
                         console.log(error + "second loop");

@@ -116,6 +116,7 @@ export async function POST(req: NextRequest, res: Response) {
     let responseStatus = {};
 
     let results = await Promise.all(promises);
+    
     for (let i = 0; i < results.length; i++) {
       let check = JSON.parse(results[i]);
 
@@ -134,7 +135,9 @@ export async function POST(req: NextRequest, res: Response) {
       return NextResponse.json(responseMessage,responseStatus)
     }
 
-    return NextResponse.json(responseMessage,responseStatus)
+    if(results.length===0){
+      return NextResponse.json({success:true,message:"Everything is upto date"})
+    }
 
 
   } catch (error: any) {
