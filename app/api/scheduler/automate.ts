@@ -147,6 +147,8 @@ async function automate(plan: string) {
             continue;
         }
     }
+
+    return "Automation finished"
 }
 
 export default automate
