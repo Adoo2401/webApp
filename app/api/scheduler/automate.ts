@@ -10,15 +10,18 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 async function automate(plan: string) {
     console.log("Automation Started");
     await mongoose.connect(process.env.MONGODB_URL!);
+    let s = "not in loop"
     let users = await User.find({ plan });
 
     for (let i = 0; i < users.length; i++) {
+        s = "First Loop"
         try {
             if (users[i].codeInAfricaApiKey && users[i].codeInAfricaSecretKey) {
 
                 let userAddedSheets = await Sheet.find({ userId: users[i]._id });
 
                 for (let j = 0; j < userAddedSheets.length; j++) {
+                    s="Second Loop"
 
 
                     try {
@@ -148,7 +151,7 @@ async function automate(plan: string) {
         }
     }
 
-    return "Automation finished"
+    return s
 }
 
 export default automate
