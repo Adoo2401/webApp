@@ -118,7 +118,6 @@ async function automate(plan: string) {
 
                     } catch (error:any) {
                         console.log(error + "second loop");
-                        await delay(30000)
                         continue;
                     }
 
