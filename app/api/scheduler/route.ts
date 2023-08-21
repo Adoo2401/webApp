@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
 
   try {
 
-    if (schedulerStarted=="false" && flag==false) {
+    
       flag = true;
       await mongoose.connect(process.env.MONGODB_URL!);
       let products = await Product.find();
@@ -29,10 +29,6 @@ export async function GET(req: NextRequest) {
         }
       }
       
-    }else{
-        console.log("automation not started")
-    }
-
     return NextResponse.json({ success: true, message: "recieved" });
   } catch (error: any) {
     return NextResponse.json(
