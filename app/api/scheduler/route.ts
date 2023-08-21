@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   let flag = false;
 
   try {
-    if (schedulerStarted && flag == false) {
+    if (schedulerStarted=="false" && flag == false) {
       await mongoose.connect(process.env.MONGODB_URL!);
       let products = await Product.find();
 
