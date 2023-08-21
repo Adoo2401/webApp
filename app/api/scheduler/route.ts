@@ -10,17 +10,17 @@ export async function GET(req: NextRequest) {
     
       await mongoose.connect(process.env.MONGODB_URL!);
       let products = await Product.find();
-      console.log("🚀 ~ file: route.ts:13 ~ GET ~ products:", products)
+      let check;
 
-      // for (let i = 0; i < products.length; i++) {
-      //   if (products[i].cronJobTiming) {
-      //     await automate(products[i].name);
-      //   } else {
-      //     continue;
-      //   }
-      // }
+      for (let i = 0; i < products.length; i++) {
+        if (products[i].cronJobTiming) {
+           check = await automate(products[i].name);
+        } else {
+          continue;
+        }
+      }
     
-    return NextResponse.json({ success: true, message: products });
+    return NextResponse.json({ success: true, message: check });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message },
