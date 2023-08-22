@@ -19,11 +19,35 @@ export async function POST (req:NextRequest){
 
         await mongoose.connect(process.env.MONGODB_URL!);
         const body = await req.json();
-        const {productId,seconds} = body;
+        const {productId,hours,minutes} = body;
 
-        await Product.findOneAndUpdate({productId},{
-           cronJobTiming:seconds
+        let planName = await Product.findOne({productId});
+
+        let cronJobUrl = "https://api.cron-job.org"
+        const cronJobApiKey = `Bearer ${process.env.CRON_JOB_API_KEY}`
+
+        let cronjobApi = await fetch(`${cronJobUrl}/jobs`,{
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":cronJobApiKey
+            },
+            body:JSON.stringify({
+                job:{
+                    url:`${process.env.NEXT_PUBLIC_BASE_URL}/api/scheduler?productName=${planName.name}`,
+                }
+            })
         })
+
+        if(!productId || !hours || !minutes){
+            return NextResponse.json({success:false,message:"Invalid Request"});
+        }
+
+
+
+        // await Product.findOneAndUpdate({productId},{
+        //    cronJobTiming:seconds
+        // })
 
         return NextResponse.json({success:true,message:"Cron Job Added"})
 

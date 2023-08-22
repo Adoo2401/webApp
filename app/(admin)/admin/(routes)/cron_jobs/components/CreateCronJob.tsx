@@ -14,18 +14,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "
 import { Label } from "@/components/ui/label"
 import { Loader, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+
 import { Button } from '@/components/ui/button';
 
 const CreateCronJob = () => {
 
     const { toast } = useToast();
     const [isProductLoading, setIsProductLoading] = useState(true);
-    const [isLoading,setIsLoading] = useState(false);
-    const [data, setData] = useState({ product: "",hour:"",minute:"",second:"" });
+    const [isLoading, setIsLoading] = useState(false);
+    const [data, setData] = useState({ product: "", hour: "", minute: "" });
+    const hours = Array.from({ length: 25 }, (_, index) => index.toString());
+    const minutes = Array.from({ length: 60 }, (_, index) => index.toString());
     const [products, setProducts] = useState([]);
 
-    const handleChange = (e:any)=>{
-        setData({...data,[e.target.name]:e.target.value});
+    const handleChange = (e: any) => {
+        setData({ ...data, [e.target.name]: e.target.value });
     }
 
     async function fetchProducts() {
@@ -51,28 +54,25 @@ const CreateCronJob = () => {
         fetchProducts();
     }, [])
 
-    async function handleCreate(){
-       if(!data.product || !data.hour || !data.minute || !data.second) { return toast({ description: "Please add all fields" }) };
-       if(parseInt(data.hour)<0 || parseInt(data.minute)<0 || parseInt(data.second)<0) { return toast({ description: "Please Enter positive values" }) };
-       if(parseInt(data.hour)>24 || parseInt(data.minute)>60 || parseInt(data.second)>60) { return toast({ description: "Please Correct values hour, minute and second" }) };
+    async function handleCreate() {
+        console.log(data);
+        if (!data.product || !data.hour || !data.minute) { return toast({ description: "Please add all fields" }) };
 
-       let seconds = parseInt(data.hour) * 3600 + parseInt(data.minute) * 60 + parseInt(data.second)
-       
         setIsLoading(true)
 
         try {
 
-            let API: any = await fetch("/api/addCronJob", { method: "POST", body: JSON.stringify({productId:data.product,seconds}), headers: { "Content-Type": "application/json" } });
+            let API: any = await fetch("/api/addCronJob", { method: "POST", body: JSON.stringify({ productId: data.product }), headers: { "Content-Type": "application/json" } });
             API = await API.json();
-            if(API.success){
-                toast({title:"Success",description:API.message});
+            if (API.success) {
+                toast({ title: "Success", description: API.message });
                 setIsLoading(false);
                 return
             }
 
-            toast({title:"Error",description:API.message});
+            toast({ title: "Error", description: API.message });
 
-        }catch(err:any){
+        } catch (err: any) {
             toast({ title: "Error", description: err.message })
         }
     }
@@ -111,11 +111,23 @@ const CreateCronJob = () => {
                         </div>
                     </div>
                     <div className='grid gap-2'>
-                        <div className='gap-4 grid grid-cols-3'>
-                            <Input placeholder='Hour' onChange={handleChange} name='hour' type='number' value={data.hour} max={24} min={0}/>
-                            <Input placeholder='Min' onChange={handleChange} name='minute' type='number' value={data.minute} max={60} min={0}/>
-                            <Input placeholder='Sec' onChange={handleChange} name='second' type='number' value={data.second} max={60} min={0}/>
+                        <div className='gap-4 grid grid-cols-1'>
+                            <div className='flex space-x-4 items-center'>
+                                <Label htmlFor='hour'>Every</Label>
+                                <Input onChange={handleChange} name='minute' type='number' max={24} />
+                                <p>Hour</p>
+                            </div>
+
                         </div>
+                        <div className='gap-4 grid grid-cols-1'>
+                            <div className='flex space-x-4 items-center'>
+                                <Label htmlFor='hour'>Every</Label>
+                                <Input onChange={handleChange} name="minute" type='number' max={60} />
+                                <p>Minute</p>
+                            </div>
+
+                        </div>
+
                     </div>
                 </CardContent>
                 <CardFooter className="justify-between space-x-2">

@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema({
     stripePriceId:{type:String},
     stripeCurrentPeriodEnd:{type:Date},
     codeInAfricaApiKey:{type:String},
-    codeInAfricaSecretKey:{type:String}
+    codeInAfricaSecretKey:{type:String},
+    cronJobIsActive:{type:Boolean},
 
 },{timestamps:true})
 
