@@ -21,7 +21,7 @@ function getRecurringIntervalInMinutes(minutes: number[]): string {
     const sortedMinutes = minutes.slice().sort((a, b) => a - b);
     const intervalGCD = sortedMinutes.reduce(gcd);
 
-    if (intervalGCD > 1) {
+    if (intervalGCD >=1) {
         return `every ${intervalGCD} minutes`;
     } else {
         return "No recurring interval";

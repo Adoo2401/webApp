@@ -21,7 +21,7 @@ function getRecurringIntervalInHours(hours: number[]): string {
     const sortedHours = hours.slice().sort((a, b) => a - b);
     const intervalGCD = sortedHours.reduce(gcd);
 
-    if (intervalGCD > 1) {
+    if (intervalGCD >= 1) {
         return `every ${intervalGCD} hours`;
     } else {
         return "No recurring interval";
