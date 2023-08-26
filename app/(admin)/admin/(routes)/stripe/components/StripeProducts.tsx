@@ -196,7 +196,7 @@ const StripeProducts = () => {
         <>
             <div className={cn("h-full flex-1 flex-col space-y-8 p-8 md:flex", isLoading ? "items-center justify-center" : "")}>
                 {
-                    isLoading ? <Loader className='animate-spin' /> : <DataTable columns={columns} data={data} />
+                    isLoading ? <Loader className='animate-spin' /> : <DataTable filter='name' columns={columns} data={data} />
                 }
             </div>
 

@@ -20,7 +20,7 @@ const productSchema = new mongoose.Schema({
       active:{type:Boolean,default:true},
     },
   ],
-  cronJobTiming:String,
+  cronJobId:String,
 });
 
 const Product = mongoose?.models?.product || mongoose.model("product", productSchema);

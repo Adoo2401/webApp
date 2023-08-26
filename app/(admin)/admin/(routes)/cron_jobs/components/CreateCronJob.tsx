@@ -23,8 +23,6 @@ const CreateCronJob = () => {
     const [isProductLoading, setIsProductLoading] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState({ product: "", hour: "", minute: "" });
-    const hours = Array.from({ length: 25 }, (_, index) => index.toString());
-    const minutes = Array.from({ length: 60 }, (_, index) => index.toString());
     const [products, setProducts] = useState([]);
 
     const handleChange = (e: any) => {
@@ -54,15 +52,43 @@ const CreateCronJob = () => {
         fetchProducts();
     }, [])
 
-    async function handleCreate() {
-        console.log(data);
-        if (!data.product || !data.hour || !data.minute) { return toast({ description: "Please add all fields" }) };
+    function generateMinutesArray(intervalInMinutes:number) {
+        const minutesArray = [];
+        
+        for (let i = 0; i < 60; i += intervalInMinutes) {
+          minutesArray.push(i);
+        }
+        
+        return minutesArray;
+    }
+    function generateHoursArray(intervalInHours:number) {
+        const hoursArray = [];
+      
+        for (let i = 0; i < 24; i += intervalInHours) {
+          hoursArray.push(i);
+        }
+      
+        return hoursArray;
+      }
 
+    async function handleCreate() {
+        
+        if (!data.product) { return toast({ description: "Please add all fields" }) };
+        if(!data.minute && !data.hour){return toast({description:"Please add Hour or Minute"})};
+        if(parseInt(data.minute)<0){return toast({description:"Minutes must be positive number"})};
+        if(parseInt(data.hour)<0){return toast({description:"Hours must be positive number"})};
+        if(parseInt(data.minute)>59){return toast({description:"Minutes must be less than 60"})};
+        if(parseInt(data.hour)>24){return toast({description:"Hours must be less than 24"})};
+        if(data.hour && data.minute){return toast({description:"Please choose either hours or minutes"})};
+
+        let hoursArray = generateHoursArray(parseInt(data.hour));
+        let minsArray = generateMinutesArray(parseInt(data.minute)); 
+       
         setIsLoading(true)
 
         try {
 
-            let API: any = await fetch("/api/addCronJob", { method: "POST", body: JSON.stringify({ productId: data.product }), headers: { "Content-Type": "application/json" } });
+            let API: any = await fetch("/api/cronJobs", { method: "POST", body: JSON.stringify({ productId: data.product,hours:hoursArray,minutes:minsArray }), headers: { "Content-Type": "application/json" } });
             API = await API.json();
             if (API.success) {
                 toast({ title: "Success", description: API.message });
@@ -70,9 +96,11 @@ const CreateCronJob = () => {
                 return
             }
 
+            setIsLoading(false);
             toast({ title: "Error", description: API.message });
 
         } catch (err: any) {
+            setIsLoading(false);
             toast({ title: "Error", description: err.message })
         }
     }
@@ -114,7 +142,7 @@ const CreateCronJob = () => {
                         <div className='gap-4 grid grid-cols-1'>
                             <div className='flex space-x-4 items-center'>
                                 <Label htmlFor='hour'>Every</Label>
-                                <Input onChange={handleChange} name='minute' type='number' max={24} />
+                                <Input onChange={handleChange} name="hour" type='number' max={24} />
                                 <p>Hour</p>
                             </div>
 
