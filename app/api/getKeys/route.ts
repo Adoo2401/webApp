@@ -15,7 +15,7 @@ export async function GET (req:NextRequest){
         
         await mongoose.connect(process.env.MONGODB_URL!)
 
-        let impKeys = await Sheet.findOne({userId}).populate("userId","codeInAfricaApiKey codeInAfricaSecretKey").select("googleSheetId sheetId");
+        let impKeys = await User.findById(userId).select("codeInAfricaApiKey codeInAfricaSecretKey googleSheetIDs sheetIDs")
         if(impKeys){
             return NextResponse.json({success:true,data:impKeys});
         }

@@ -35,7 +35,10 @@ export async function POST(req: NextRequest, res: Response) {
       return NextResponse.json({ success: false, message: "Something went wrong while fetching token or Invalid code of africa API key or Secret make sure you enter correct" }, { status: 400 })
     }
 
-    await User.findByIdAndUpdate(userId, { codeInAfricaApiKey: apiKey, codeInAfricaSecretKey: apiSecret }, { new: true })
+    await User.findByIdAndUpdate(userId, { codeInAfricaApiKey: apiKey, codeInAfricaSecretKey: apiSecret,$addToSet:{
+      googleSheetIDs:googleSheetId,
+      sheetIDs:sheetId
+    }})
     token = token.content.token;
 
     let data = [];

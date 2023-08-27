@@ -90,6 +90,15 @@ export async function POST(req: NextRequest) {
             })
         });
 
+        if(!cronjobApi.ok){
+            if(cronjobApi.status==429){
+                return NextResponse.json({ success: false, message: "Cron-job.org API rate limit exceeded" });
+            }
+
+            return NextResponse.json({success:false,message:"Can't reach cron-job.org API at a moment please try again"});
+        }
+        
+
         // Parse the API response for the created cron job
         const cronjobApiResponse: CronJobApiResponse = await cronjobApi.json();
 
@@ -102,7 +111,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Return a response indicating that the cron job couldn't be created
-        return NextResponse.json({ success: true, message: "Can't create cron job right now" });
+        return NextResponse.json({ success: false, message: "Can't create cron job right now" });
 
     } catch (error: any) {
         // Handle errors and return an error response
@@ -149,6 +158,17 @@ export async function GET(req: NextRequest) {
         let jobs = await fetch(`${cronJobUrl}/jobs`, {
             headers: { "Authorization": cronJobApiKey },
         });
+
+        // checking if quota limits exceeded or anyother error
+
+        if(!jobs.ok){
+            if(jobs.status==429){
+                return NextResponse.json({ success: false, message: "Cron-job.org API rate limit exceeded" });
+            }
+
+            return NextResponse.json({success:false,message:"Can't reach cron-job.org API at a moment please try again"});
+        }
+        
         let jobsData: any = await jobs.json();
 
         // Process fetched jobs data and associate with product names

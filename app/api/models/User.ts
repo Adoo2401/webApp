@@ -15,6 +15,8 @@ const userSchema = new mongoose.Schema({
     codeInAfricaApiKey:{type:String},
     codeInAfricaSecretKey:{type:String},
     cronJobIsActive:{type:Boolean},
+    googleSheetIDs:[],
+    sheetIDs:[],
 
 },{timestamps:true})
 

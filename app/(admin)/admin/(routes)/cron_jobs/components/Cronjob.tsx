@@ -158,7 +158,7 @@ const CronJobs = () => {
             header: "Schedule",
             id: "schedule",
             cell: ({ row }) => {
-                return row?.original?.schedule?.hours.includes(-1) ? getRecurringIntervalInMinutes(row.original.schedule.minutes) : getRecurringIntervalInHours(row.original.schedule.hours)
+                return row?.original?.schedule?.hours.includes(-1) ? getRecurringIntervalInMinutes(row.original.schedule.minutes,false) : getRecurringIntervalInHours(row.original.schedule.hours,false)
             }
         },
         {
@@ -208,7 +208,7 @@ const CronJobs = () => {
                             <DropdownMenuItem onClick={() => deleteProduct(cronJob.jobId,cronJob.product)} className='text-red-500 cursor-pointer'>
                                 Delete
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.push("stripe/edit_product/" + cronJob._id)} className=' cursor-pointer'>
+                            <DropdownMenuItem onClick={() => router.push(`cron_jobs/edit_cron_job/${cronJob.jobId}`)} className=' cursor-pointer'>
                                 Edit cron job
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => disable(cronJob.jobId, cronJob.enabled)} className=' cursor-pointer'>

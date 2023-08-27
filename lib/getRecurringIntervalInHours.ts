@@ -4,7 +4,7 @@
  * @param {number[]} hours - An array of hours.
  * @returns {string} - The recurring interval description.
  */
-function getRecurringIntervalInHours(hours: number[]): string {
+function getRecurringIntervalInHours(hours: number[],isOnlyNumber: boolean): string {
     if (!Array.isArray(hours) || hours.length === 0) {
         return "No hours specified";
     }
@@ -22,8 +22,15 @@ function getRecurringIntervalInHours(hours: number[]): string {
     const intervalGCD = sortedHours.reduce(gcd);
 
     if (intervalGCD >= 1) {
-        return `every ${intervalGCD} hours`;
-    } else {
+        if(isOnlyNumber){
+            return intervalGCD.toString();
+        }else{
+            return `every ${intervalGCD} hours`;
+        }
+    }else if(intervalGCD===0){
+        return "0"
+    } 
+    else {
         return "No recurring interval";
     }
 }
