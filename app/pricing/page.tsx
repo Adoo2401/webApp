@@ -1,6 +1,4 @@
-
-
-import Navbar from '@/components/Navbar'
+"use client"
 import PricingComponent from './PricingComponent'
 
 type Params = {
@@ -14,12 +12,9 @@ const page = ({searchParams,params}:Params) => {
 
   return (
     <>
-    <Navbar isHome={false}/>
     <PricingComponent/>
     </>
   )
 }
 
 export default page
-
-export const dynamic = "force-dynamic"
