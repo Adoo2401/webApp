@@ -1,7 +1,17 @@
+
+
 import Navbar from '@/components/Navbar'
 import PricingComponent from './PricingComponent'
 
-const page = () => {
+type Params = {
+  searchParams: URLSearchParams,
+  params: {
+    id:string | undefined
+  }
+}
+
+const page = ({searchParams,params}:Params) => {
+
   return (
     <>
     <Navbar isHome={false}/>
