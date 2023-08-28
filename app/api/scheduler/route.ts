@@ -9,21 +9,14 @@ export async function GET(request: Request) {
   try {
     
       const url = new URL(request.url);
-      console.log("🚀 ~ file: route.ts:12 ~ GET ~ url:", url)
       const productName = url.searchParams.get("productName");      
-      console.log("🚀 ~ file: route.ts:13 ~ GET ~ productName:", productName)
 
-      // await mongoose.connect(process.env.MONGODB_URL!);
-      // let products = await Product.find();
-      // let check;
+      if(!productName){return NextResponse.json({success:false,message:"Search Params empty"},{status:400})};
+      
 
-      // for (let i = 0; i < products.length; i++) {
-      //   if (products[i].cronJobTiming) {
-      //      check = await automate(products[i].name);
-      //   } else {
-      //     continue;
-      //   }
-      // }
+      await mongoose.connect(process.env.MONGODB_URL!);
+      await automate(productName);
+      
     
     return NextResponse.json({ success: true, message:productName});
   } catch (error: any) {

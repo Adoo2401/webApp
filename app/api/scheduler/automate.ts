@@ -5,8 +5,6 @@ import { GoogleSpreadsheet } from 'google-spreadsheet'
 import Sheet from "../models/Sheet";
 
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 async function automate(plan: string) {
     console.log("Automation Started");
     await mongoose.connect(process.env.MONGODB_URL!);
@@ -21,7 +19,7 @@ async function automate(plan: string) {
                 let userAddedSheets = await Sheet.find({ userId: users[i]._id });
 
                 for (let j = 0; j < userAddedSheets.length; j++) {
-                    s="Second Loop"
+                    s = "Second Loop"
 
 
                     try {
@@ -37,7 +35,7 @@ async function automate(plan: string) {
                             continue;
                         }
 
-                        let token: any = await fetch("https://api.codinafrica.com/api/users/apilogin", { cache:"no-store",method: "POST", body: JSON.stringify({ key: users[i].codeInAfricaApiKey, secret: users[i].codeInAfricaSecretKey }), headers: { "Content-Type": "application/json" } });
+                        let token: any = await fetch("https://api.codinafrica.com/api/users/apilogin", { cache: "no-store", method: "POST", body: JSON.stringify({ key: users[i].codeInAfricaApiKey, secret: users[i].codeInAfricaSecretKey }), headers: { "Content-Type": "application/json" } });
                         token = await token.json();
 
                         if (!token?.content?.token) {
@@ -89,12 +87,17 @@ async function automate(plan: string) {
 
                         for (const row of rows) {
 
-
-
                             k = k + 1
                             const rowData: any = {};
 
                             rowData["orderId"] = row.get("order id") || row.get("Order ID") || row.get("order Id") || row.get("orderId") || row.get("OrderId");
+
+                            let idOnGoogleSheet = row.get("order id") || row.get("Order ID") || row.get("order Id") || row.get("orderId") || row.get("OrderId");
+                            const orderId = await Sheet.findOne({ idOnGoogleSheet, userId:users[i]._id, googleSheetId:userAddedSheets[j].googleSheetId,sheetId:userAddedSheets[j].sheetId});
+                            if (orderId) {
+                                continue
+                            }
+
                             rowData["orderId"] = `${store}-${orderCountry}-${k}`
 
                             rowData["source"] = row.get("product url") || row.get("Product URL") || row.get("product URL") || row.get("Product url") || row.get("productUrl") || row.get("productURL") || row.get("ProductUrl") || row.get("source") || row.get("Source")
@@ -121,13 +124,13 @@ async function automate(plan: string) {
                             }, 0)
 
 
-                            data.push({ ...rowData, userId: users[i]._id, googleSheetId: userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId });
+                            data.push({ ...rowData,idOnGoogleSheet, userId: users[i]._id, googleSheetId: userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId });
 
                         }
                         console.log(token.content.token);
 
                         const promises = data.map(async (object: any) => {
-                            const response = await fetch("https://api.codinafrica.com/api/orders/apicreate", { cache:"no-store",method: "POST", headers: { "Content-Type": "application/json;charset=utf-8", "x-auth-token": token.content.token }, body: JSON.stringify(object) });
+                            const response = await fetch("https://api.codinafrica.com/api/orders/apicreate", { cache: "no-store", method: "POST", headers: { "Content-Type": "application/json;charset=utf-8", "x-auth-token": token.content.token }, body: JSON.stringify(object) });
                             return response.text();
                         });
 

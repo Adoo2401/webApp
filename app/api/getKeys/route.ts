@@ -17,7 +17,7 @@ export async function GET (req:NextRequest){
 
         let impKeys = await User.findById(userId).select("codeInAfricaApiKey codeInAfricaSecretKey googleSheetIDs sheetIDs")
         if(impKeys){
-            return NextResponse.json({success:true,data:impKeys});
+            return NextResponse.json({success:true,codeInAfricaKey:impKeys?.codeInAfricaApiKey,codeInAfricaSecretKey:impKeys?.codeInAfricaSecretKey,googleSheetIDs:impKeys.googleSheetIDs,sheetIDs:impKeys.sheetIDs});
         }
         
         return NextResponse.json({success:false,message:"Can't get Important keys"});
@@ -26,3 +26,5 @@ export async function GET (req:NextRequest){
         return NextResponse.json({success:false,message:error.message});
     }
 }
+
+export const dynamic = "force-dynamic"

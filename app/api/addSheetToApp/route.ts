@@ -22,23 +22,10 @@ export async function POST(req: NextRequest, res: Response) {
 
     const body = await req.json();
 
-    let { googleSheetId, prefix, apiKey, apiSecret, product, sheetId } = body
+    let { googleSheetId, prefix, sheetId , product} = body
 
 
-    if (!googleSheetId || !prefix || !apiKey || !apiSecret || !product) { return NextResponse.json({ success: false, message: "Enter all the fields" }, { status: 400 }) };
-
-    let token: any = await fetch("https://api.codinafrica.com/api/users/apilogin", { method: "POST", body: JSON.stringify({ key: apiKey, secret: apiSecret }), headers: { "Content-Type": "application/json" } });
-    token = await token.json();
-
-    if (!token?.content?.token) {
-      return NextResponse.json({ success: false, message: "Something went wrong while fetching token or Invalid code of africa API key or Secret make sure you enter correct" }, { status: 400 })
-    }
-
-    await User.findByIdAndUpdate(userId, { codeInAfricaApiKey: apiKey, codeInAfricaSecretKey: apiSecret,$addToSet:{
-      googleSheetIDs:googleSheetId,
-      sheetIDs:sheetId
-    }})
-    token = token.content.token;
+    if (!googleSheetId || !prefix ||!product) { return NextResponse.json({ success: false, message: "Enter all the fields" }, { status: 400 }) };
 
     let data = [];
 
@@ -72,7 +59,6 @@ export async function POST(req: NextRequest, res: Response) {
       if (orderId) {
         continue
       }
-
 
       rowData["orderId"] = `${store}-${orderCountry}-${i}`
 
@@ -109,39 +95,8 @@ export async function POST(req: NextRequest, res: Response) {
     }
 
    
-    const promises = data.map(async (object: any) => {
-      const response = await fetch("https://api.codinafrica.com/api/orders/apicreate", { method: "POST", headers: { "Content-Type": "application/json;charset=utf-8", "x-auth-token": token }, body: JSON.stringify(object) });
-      return response.text();
-    });
-
-    let responseMessage:any = {};
-    let responseStatus = {};
-
-    let results = await Promise.all(promises);
-    
-    for (let i = 0; i < results.length; i++) {
-      let check = JSON.parse(results[i]);
-
-      if (check?.content) {
-        responseMessage = { success: false, message: check?.content };
-        responseStatus = { status: 500 }
-        continue
-      }
-      responseMessage = { success: true, message: "Order Created Successfully" },
-      responseStatus = { status: 200 }
-    }
-
-
-    if(responseMessage.success){
-      await Sheet.insertMany(data)
-      return NextResponse.json(responseMessage,responseStatus)
-    }
-
-    if(results.length===0){
-      return NextResponse.json({success:true,message:"Everything is upto date"})
-    }
-
-
+    await Sheet.insertMany(data);
+    return NextResponse.json({success:true,message:"Sheet uploaded successfully"},{status:200})
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 })
   }
