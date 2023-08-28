@@ -44,7 +44,7 @@ export default function PricingComponent() {
 
     async function fetchStripeProducts() {
         try {
-            let API: any = await fetch("/api/getPricing");
+            let API: any = await fetch("/api/getPricing",{cache:"no-store"});
             API = await API.json();
             if (API.success) {
                 setProductsData(API.message);
@@ -60,6 +60,7 @@ export default function PricingComponent() {
     useEffect(() => {
         fetchStripeProducts();
     }, [])
+
     const PricingSection = ({ productsData }: any) => {
 
 
