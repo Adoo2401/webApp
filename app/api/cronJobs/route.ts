@@ -177,7 +177,7 @@ export async function GET(req: NextRequest) {
                 let product = await Product.findOne({
                     cronJobId: jobsData.jobs[i]?.jobId?.toString(),
                 });
-                resp.push({ ...jobsData.jobs[i], product: product.name });
+                resp.push({ ...jobsData.jobs[i], product: product.name,productId:product.productId });
             }
             return NextResponse.json(
                 { success: true, message: resp },

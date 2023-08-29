@@ -21,6 +21,7 @@ const productSchema = new mongoose.Schema({
     },
   ],
   cronJobId:String,
+  noOfSheets:Number
 });
 
 const Product = mongoose?.models?.product || mongoose.model("product", productSchema);

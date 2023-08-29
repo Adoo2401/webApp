@@ -195,6 +195,7 @@ const CronJobs = () => {
             id: "actions",
             cell: ({ row }) => {
                 const cronJob: any = row.original
+                console.log(cronJob);
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -208,7 +209,7 @@ const CronJobs = () => {
                             <DropdownMenuItem onClick={() => deleteProduct(cronJob.jobId,cronJob.product)} className='text-red-500 cursor-pointer'>
                                 Delete
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.push(`cron_jobs/edit_cron_job/${cronJob.jobId}`)} className=' cursor-pointer'>
+                            <DropdownMenuItem onClick={() => router.push(`cron_jobs/edit_cron_job/${cronJob.jobId}/${cronJob.productId}`)} className=' cursor-pointer'>
                                 Edit cron job
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => disable(cronJob.jobId, cronJob.enabled)} className=' cursor-pointer'>

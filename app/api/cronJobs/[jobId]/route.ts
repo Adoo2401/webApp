@@ -295,8 +295,11 @@ export async function PUT(req: NextRequest, { params }: { params: Params }): Pro
     const body = await req.json();
     const { productId, hours, minutes } = body;
 
+    const url = new URL(req.url);
+    const previousChosenProduct = url.searchParams.get("productId");  
+
     // Check if the required parameters are present in the request
-    if (!productId || !minutes || !hours) {
+    if (!productId || !minutes || !hours ||!previousChosenProduct) {
         return NextResponse.json({ success: false, message: "Invalid Request" });
     }
 
@@ -319,7 +322,7 @@ export async function PUT(req: NextRequest, { params }: { params: Params }): Pro
 
     // Find the product based on productId
     let product = await Product.findOne({ productId });
-
+    
     if (product.cronJobId) {
         return NextResponse.json({ success: false, message: "Product already has a cron job" });
     }
@@ -355,6 +358,8 @@ export async function PUT(req: NextRequest, { params }: { params: Params }): Pro
 
     cronjobApi = await cronjobApi.json();
     if (cronjobApi) {
+        await Product.findOneAndUpdate({productId:previousChosenProduct},{cronJobId:null});
+        await Product.findOneAndUpdate({productId},{cronJobId:params.jobId});
         return NextResponse.json({ success: true, message: "CronJob updated successfully" });
     }
 

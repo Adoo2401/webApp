@@ -21,11 +21,13 @@ import getRecurringIntervalInMinutes from '@/lib/getRecurringIntervalInMinutes';
 
 type Params = {
     params:{
-        jobId:string
+        id:string[]
     }
 }
 
 const EditCronJob = ({params}:Params) => {
+
+    const [jobId,productId] = params.id
 
     const { toast } = useToast();
     const [isProductLoading, setIsProductLoading] = useState(true);
@@ -65,7 +67,7 @@ const EditCronJob = ({params}:Params) => {
     async function fetchSingleCronJob(){
         try {
             
-            let singleCronJob : any = await fetch(`/api/cronJobs/${params.jobId}`);
+            let singleCronJob : any = await fetch(`/api/cronJobs/${jobId}`);
             singleCronJob = await singleCronJob.json();
 
             if(singleCronJob.success){
@@ -119,7 +121,7 @@ const EditCronJob = ({params}:Params) => {
         if(parseInt(data.hour)<0){return toast({description:"Hours must be positive number"})};
         if(parseInt(data.minute)>59){return toast({description:"Minutes must be less than 60"})};
         if(parseInt(data.hour)>24){return toast({description:"Hours must be less than 24"})};
-        if(data.hour && data.minute){return toast({description:"Please choose either hours or minutes"})};
+        if(!data.hour && !data.minute){return toast({description:"Please choose either hours or minutes"})};
 
         let hoursArray = generateHoursArray(parseInt(data.hour));
         let minsArray = generateMinutesArray(parseInt(data.minute)); 
@@ -128,7 +130,7 @@ const EditCronJob = ({params}:Params) => {
 
         try {
 
-            let API: any = await fetch(`/api/cronJobs/${params.jobId}`, { method: "PUT", body: JSON.stringify({ productId: data.product,hours:hoursArray,minutes:minsArray }), headers: { "Content-Type": "application/json" } });
+            let API: any = await fetch(`/api/cronJobs/${jobId}?productId=${productId}`, { method: "PUT", body: JSON.stringify({ productId: data.product,hours:hoursArray,minutes:minsArray }), headers: { "Content-Type": "application/json" } });
             API = await API.json();
             if (API.success) {
                 toast({ title: "Success", description: API.message });

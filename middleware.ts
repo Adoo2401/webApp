@@ -6,12 +6,6 @@ import { NextResponse } from "next/server";
 export default withAuth(
     function middleware(request: NextRequestWithAuth) {
 
-    let parts: any = request.nextUrl.pathname.split("/");
-
-    if (parts.length >= 3) {
-       parts = parts.slice(2).join("/");
-    }
-
     if (
       request.nextUrl.pathname.startsWith("/dashboard") &&
       request.nextauth.token?.plan === "none"
@@ -20,7 +14,7 @@ export default withAuth(
     }
 
     if (
-      request.nextUrl.pathname.startsWith(`/admin/${parts}`) &&
+      request.nextUrl.pathname.startsWith(`/admin`) &&
       request.nextauth.token?.role !== "admin"
     ) {
       return NextResponse.redirect(new URL("/", request.url));

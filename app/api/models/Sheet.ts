@@ -18,7 +18,8 @@ const sheetSchema = new mongoose.Schema({
     total:{type:Number},
     googleSheetId:{type:String,required:true},
     sheetId:{type:String,required:true},
-    idOnGoogleSheet:{type:String}
+    idOnGoogleSheet:{type:String},
+    isCronjobActive:{type:Boolean,default:true},
 })
 
 const Sheet = mongoose.models.sheet || mongoose.model("sheet",sheetSchema);

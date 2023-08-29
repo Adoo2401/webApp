@@ -1,4 +1,4 @@
-import { Code, User2 , LayoutDashboard, DollarSign ,MusicIcon, Settings, CircleDollarSign, Timer } from "lucide-react";
+import { Code, User2 , LayoutDashboard, DollarSign ,MusicIcon, Settings, CircleDollarSign, Timer, Sheet } from "lucide-react";
 
 
 const routes = [
@@ -33,9 +33,9 @@ const routes = [
         color:"#10b981"
     },
     {
-        label:"Code Generation",
-        icon:Code,
-        href:"/admin/code",
+        label:"Sheet Plans",
+        icon:Sheet,
+        href:"/admin/sheet_plans",
         color:"#15803d"
     },
     {
