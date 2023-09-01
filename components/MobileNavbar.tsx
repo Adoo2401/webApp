@@ -55,7 +55,7 @@ const MobileSidebar = ({isHome}:{isHome:boolean}) => {
 
     useEffect(() => {
         getSuccessParams();
-    }, [searchParams,status])
+    }, [status])
 
     if (!isMounted) {
         return null
