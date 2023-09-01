@@ -6,6 +6,7 @@ const sheetSchema = new mongoose.Schema({
     source:{type:String,required:true},
     fullName:{type:String,required:true},
     phone:{type:String,required:true},
+    title:{type:String,required:true,default:"Untitled"},
     city:{type:String},
     items:[
         {

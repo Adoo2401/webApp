@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import schedule from "node-schedule";
-import Product from "@/app/api/models/Product";
 import mongoose from "mongoose";
 import automate from "./automate";
 

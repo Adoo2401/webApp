@@ -27,6 +27,7 @@ export async function POST(req: NextRequest, res: Response) {
 
     if (!googleSheetId || !prefix ||!product) { return NextResponse.json({ success: false, message: "Enter all the fields" }, { status: 400 }) };
 
+    if(googleSheetId.includes("/")){return NextResponse.json({ success: false, message: "Enter valid google sheet id it should not contain /" }, { status: 400 })}
     let data = [];
 
     const pattern = /^[a-zA-Z0-9]+-[a-zA-Z0-9]+-\d+$/;
@@ -38,6 +39,8 @@ export async function POST(req: NextRequest, res: Response) {
 
     const doc = new GoogleSpreadsheet(googleSheetId, serviceAccountAuth);
     await doc.loadInfo();
+
+    const title = doc.title;
 
     const sheet = doc.sheetsById[sheetId || 0]
     if (!sheet) { return NextResponse.json({ success: false, message: "Sheet Not found please see that if you have written correct sheet Id" }, { status: 500 }) }
@@ -91,7 +94,7 @@ export async function POST(req: NextRequest, res: Response) {
       }, 0)
 
 
-      data.push({ ...rowData, userId, googleSheetId, sheetId,idOnGoogleSheet });
+      data.push({ ...rowData, userId, googleSheetId, sheetId,idOnGoogleSheet,title });
     }
 
    

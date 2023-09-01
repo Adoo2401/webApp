@@ -27,6 +27,8 @@ export async function POST(req: NextRequest, res: Response) {
 
     if (!googleSheetId || !prefix || !apiKey || !apiSecret || !product) { return NextResponse.json({ success: false, message: "Enter all the fields" }, { status: 400 }) };
 
+    if(googleSheetId.includes("/")){return NextResponse.json({ success: false, message: "Enter valid google sheet id it should not contain /" }, { status: 400 })}
+
     let token: any = await fetch("https://api.codinafrica.com/api/users/apilogin", { method: "POST", body: JSON.stringify({ key: apiKey, secret: apiSecret }), headers: { "Content-Type": "application/json" } });
     token = await token.json();
 
@@ -51,7 +53,7 @@ export async function POST(req: NextRequest, res: Response) {
 
     const doc = new GoogleSpreadsheet(googleSheetId, serviceAccountAuth);
     await doc.loadInfo();
-
+    const title = doc.title
     const sheet = doc.sheetsById[sheetId || 0]
     if (!sheet) { return NextResponse.json({ success: false, message: "Sheet Not found please see that if you have written correct sheet Id" }, { status: 500 }) }
 
@@ -105,10 +107,10 @@ export async function POST(req: NextRequest, res: Response) {
       }, 0)
 
 
-      data.push({ ...rowData, userId, googleSheetId, sheetId,idOnGoogleSheet });
+      data.push({ ...rowData, userId, googleSheetId, sheetId,idOnGoogleSheet,title });
     }
 
-   
+  
     const promises = data.map(async (object: any) => {
       const response = await fetch("https://api.codinafrica.com/api/orders/apicreate", { method: "POST", headers: { "Content-Type": "application/json;charset=utf-8", "x-auth-token": token }, body: JSON.stringify(object) });
       return response.text();

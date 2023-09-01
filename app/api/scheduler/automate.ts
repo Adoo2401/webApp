@@ -6,21 +6,20 @@ import Sheet from "../models/Sheet";
 
 
 async function automate(plan: string) {
-    console.log("Automation Started");
+    
     await mongoose.connect(process.env.MONGODB_URL!);
-    let s = "not in loop"
+    
     let users = await User.find({ plan });
 
     for (let i = 0; i < users.length; i++) {
-        s = "First Loop"
+       
         try {
             if (users[i].codeInAfricaApiKey && users[i].codeInAfricaSecretKey) {
 
-                let userAddedSheets = await Sheet.find({ userId: users[i]._id });
+                let userAddedSheets = await Sheet.find({ userId: users[i]._id , isCronjobActive: true });
 
                 for (let j = 0; j < userAddedSheets.length; j++) {
-                    s = "Second Loop"
-
+                
 
                     try {
                         let currentGoogleSheetID = userAddedSheets[j].googleSheetId;
@@ -48,8 +47,7 @@ async function automate(plan: string) {
 
                         let offset = 0;
                         offset = (await Sheet.find({ userId: users[i]._id, googleSheetId: userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId })).length;
-                        console.log("🚀 ~ file: automate.ts:37 ~ automate ~ offset:", offset)
-
+                        
                         const highestOrderPrefix = await Sheet.aggregate([
                             {
                                 $project: {
@@ -127,8 +125,7 @@ async function automate(plan: string) {
                             data.push({ ...rowData,idOnGoogleSheet, userId: users[i]._id, googleSheetId: userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId });
 
                         }
-                        console.log(token.content.token);
-
+                        
                         const promises = data.map(async (object: any) => {
                             const response = await fetch("https://api.codinafrica.com/api/orders/apicreate", { cache: "no-store", method: "POST", headers: { "Content-Type": "application/json;charset=utf-8", "x-auth-token": token.content.token }, body: JSON.stringify(object) });
                             return response.text();
@@ -149,12 +146,11 @@ async function automate(plan: string) {
                 continue
             }
         } catch (error) {
-            console.log(error + "First Loop");
             continue;
         }
     }
 
-    return s
+
 }
 
 export default automate

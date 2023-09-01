@@ -13,7 +13,7 @@ const monterrat = Montserrat({ weight: "600", subsets: ["latin"] });
 const routes = [
     { href: "/dashboard", color: "#0ea5e9", label: "Dashboard", icon: LayoutDashboard},
     { href: "/dashboard/add_sheet_to_app", color: "#8b5cf6", label: "Add sheet to app first", icon: FilePlus },
-    { href: "/dashboard/sheets", color: "##c2410c", label: "Sheets", icon: Sheet },
+    { href: "/dashboard/sheets", color: "#c2410c", label: "Sheets", icon: Sheet },
 ]
 
 

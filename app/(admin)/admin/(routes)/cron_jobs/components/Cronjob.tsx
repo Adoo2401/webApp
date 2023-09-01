@@ -195,7 +195,6 @@ const CronJobs = () => {
             id: "actions",
             cell: ({ row }) => {
                 const cronJob: any = row.original
-                console.log(cronJob);
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
