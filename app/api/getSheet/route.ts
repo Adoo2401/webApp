@@ -29,6 +29,9 @@ export async function POST(req: NextRequest, res: Response) {
 
     if(googleSheetId.includes("/")){return NextResponse.json({ success: false, message: "Enter valid google sheet id it should not contain /" }, { status: 400 })}
 
+    let disableCheck = await Sheet.findOne({ googleSheetId,userId,enabled:false })
+    if(disableCheck) {return NextResponse.json({ success: false, message: "Sheet is disabled" }, { status: 400 })};
+
     let token: any = await fetch("https://api.codinafrica.com/api/users/apilogin", { method: "POST", body: JSON.stringify({ key: apiKey, secret: apiSecret }), headers: { "Content-Type": "application/json" } });
     token = await token.json();
 

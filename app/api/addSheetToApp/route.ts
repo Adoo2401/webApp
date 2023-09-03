@@ -30,6 +30,9 @@ export async function POST(req: NextRequest, res: Response) {
     if(googleSheetId.includes("/")){return NextResponse.json({ success: false, message: "Enter valid google sheet id it should not contain /" }, { status: 400 })}
     let data = [];
 
+    let disableCheck = await Sheet.findOne({ googleSheetId,userId,enabled:false })
+    if(disableCheck) {return NextResponse.json({ success: false, message: "Sheet is disabled" }, { status: 400 })};
+
     const pattern = /^[a-zA-Z0-9]+-[a-zA-Z0-9]+-\d+$/;
     const match = prefix.match(pattern);
 

@@ -21,6 +21,7 @@ const sheetSchema = new mongoose.Schema({
     sheetId:{type:String,required:true},
     idOnGoogleSheet:{type:String},
     isCronjobActive:{type:Boolean,default:true},
+    enabled:{type:Boolean,default:true},
 })
 
 const Sheet = mongoose.models.sheet || mongoose.model("sheet",sheetSchema);

@@ -68,17 +68,35 @@ export async function PATCH(req: NextRequest,{params}:{params:Params}) {
         const body = await req.json();
         const {isEnabled} = body
 
-        // Connect to the MongoDB database
+        const url = new URL(req.url);
+        const status = url.searchParams.get("status");
+
         await mongoose.connect(process.env.MONGODB_URL!);
 
+        if(status){
+            
         await Sheet.updateMany(
             {googleSheetId:params.id},
             {
-                isCronjobActive:isEnabled
+                enabled:isEnabled
             }
         )
+        return NextResponse.json({ success: true, message:"Sheet Status Updated"});
+        }else{
 
-        return NextResponse.json({ success: true, message:"Cron job status updated"});
+            await Sheet.updateMany(
+                {googleSheetId:params.id},
+                {
+                    isCronjobActive:isEnabled
+                }
+            )
+
+            return NextResponse.json({ success: true, message:"Cron job status updated"});
+        }
+
+        // Connect to the MongoDB database
+
+
 
 
     } catch (error: any) {

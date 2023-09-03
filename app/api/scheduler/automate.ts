@@ -16,7 +16,7 @@ async function automate(plan: string) {
         try {
             if (users[i].codeInAfricaApiKey && users[i].codeInAfricaSecretKey) {
 
-                let userAddedSheets = await Sheet.find({ userId: users[i]._id , isCronjobActive: true });
+                let userAddedSheets = await Sheet.find({ userId: users[i]._id , isCronjobActive: true, enabled: true });
 
                 for (let j = 0; j < userAddedSheets.length; j++) {
                 

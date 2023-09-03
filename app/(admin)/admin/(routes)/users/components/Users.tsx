@@ -186,6 +186,9 @@ const Users = () => {
                                <DropdownMenuItem className="cursor-pointer" onClick={()=>router.push(`/admin/users/edit_user/${user._id}`)}>
                                     Edit User
                                </DropdownMenuItem>
+                               <DropdownMenuItem className="cursor-pointer" onClick={()=>router.push(`/admin/sheets/${user._id}`)}>
+                                    See Sheets
+                               </DropdownMenuItem>
                             <DropdownMenuSeparator />
                         </DropdownMenuContent>
                     </DropdownMenu>

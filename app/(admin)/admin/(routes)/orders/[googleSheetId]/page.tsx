@@ -44,8 +44,11 @@ interface OrderItem {
     total: number;
   }
   
+  type Params = {
+    googleSheetId: string
+  }
 
-const Orders = (props:Props) => {
+const Orders = ({params}:{params:Params}) => {
     const { toast } = useToast()
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
@@ -54,7 +57,7 @@ const Orders = (props:Props) => {
     async function getData() {
         setIsLoading(true);
         try {
-            let API: any = await fetch(`/api/userSheets/${props.googleSheetId}`);
+            let API: any = await fetch(`/api/userSheets/${params.googleSheetId}`);
             API = await API.json();
 
             if (API.success) {

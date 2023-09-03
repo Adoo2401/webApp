@@ -23,13 +23,18 @@ export async function GET(req: NextRequest) {
         // Connect to the MongoDB database
         await mongoose.connect(process.env.MONGODB_URL!);
 
-        let user = await User.findById(userId).select("googleSheetIDs");
+        const url = new URL(req.url);
+        const queryId = url.searchParams.get("userId");
+        
+        let findById = queryId || userId;
+        
+        let user = await User.findById(findById).select("googleSheetIDs");
         let resp = []
 
         if (user.googleSheetIDs) {
             for (let i = 0; i < user?.googleSheetIDs.length; i++) {
                 let sheets = await Sheet.find({ googleSheetId: user?.googleSheetIDs[i]});
-                resp.push({ googleSheetId: user?.googleSheetIDs[i], orders: sheets.length, cronJobActive: sheets[0]?.isCronjobActive || null, title: sheets[0]?.title || "No sheet added until now"});
+               resp.push({ enabled:sheets[0]?.enabled,googleSheetId: user?.googleSheetIDs[i], orders: sheets.length, cronJobActive: sheets[0]?.isCronjobActive || null, title: sheets[0]?.title || "No sheet added until now"});
                 
             }
         }

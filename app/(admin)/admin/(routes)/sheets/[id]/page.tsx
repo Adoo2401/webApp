@@ -21,18 +21,22 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
 
 type UserSheets = {
     googleSheetId: string
     orders: number,
     cronJobActive: boolean,
-    title: string
+    title: string,
+    enabled: boolean
+}
+
+type Params = {
+    id: string
 }
 
 
-const Sheets = () => {
+const Sheets = ({ params }: { params: Params }) => {
 
     const { toast } = useToast()
     const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +47,7 @@ const Sheets = () => {
     async function getData() {
         setIsLoading(true);
         try {
-            let API: any = await fetch("/api/userSheets");
+            let API: any = await fetch(`/api/userSheets?userId=${params.id}`);
             API = await API.json();
 
             if (API.success) {
@@ -86,28 +90,49 @@ const Sheets = () => {
         }
     }
 
-    async function disable(id: string, isEnabled: boolean) {
+    async function disable(id: string, isEnabled: boolean, isStatus: boolean) {
         setIsLoading(true);
         try {
-            let API: any = await fetch(`/api/userSheets/${id}`, { method: "PATCH", body: JSON.stringify({ isEnabled: isEnabled }), headers: { "Content-Type": "application/json" } });
-            API = await API.json();
 
-            if (API.success) {
-                toast({ title: "Success", description: API.message });
+            if (isStatus) {
+                let API: any = await fetch(`/api/userSheets/${id}?status=true`, { method: "PATCH", body: JSON.stringify({ isEnabled: isEnabled }), headers: { "Content-Type": "application/json" } });
+                API = await API.json();
 
-                setData(data.map((item: any) => {
-                    if (item.googleSheetId === id) {
-                        return { ...item, cronJobActive: isEnabled }
-                    }
-                    return item
-                }))
+                if (API.success) {
+                    toast({ title: "Success", description: API.message });
 
-                setIsLoading(false);
-                return
+                    setData(data.map((item: any) => {
+                        if (item.googleSheetId === id) {
+                            return { ...item, enabled: isEnabled }
+                        }
+                        return item
+                    }))
+
+                    setIsLoading(false);
+                    return toast({ title: "Success", description: API.message });
+            
+                }
+            } else {
+                let API: any = await fetch(`/api/userSheets/${id}`, { method: "PATCH", body: JSON.stringify({ isEnabled: isEnabled }), headers: { "Content-Type": "application/json" } });
+                API = await API.json();
+
+                if (API.success) {
+                    toast({ title: "Success", description: API.message });
+
+                    setData(data.map((item: any) => {
+                        if (item.googleSheetId === id) {
+                            return { ...item, cronJobActive: isEnabled }
+                        }
+                        return item
+                    }))
+
+                    setIsLoading(false);
+            
+                    return toast({ title: "Success", description: API.message });
+                    
+                }
             }
 
-            toast({ title: "Error", description: API.message });
-            setIsLoading(false);
 
         } catch (error: any) {
             toast({ title: "Error", description: error.message })
@@ -115,12 +140,12 @@ const Sheets = () => {
         }
     }
 
-    async function update(id:string){
-         
-        if(!updateInputRef?.current?.value) return toast({ title: "Error", description: "Please enter google sheet id" })
+    async function update(id: string) {
+
+        if (!updateInputRef?.current?.value) return toast({ title: "Error", description: "Please enter google sheet id" })
         setIsLoading(true);
         try {
-            let API: any = await fetch(`/api/userSheets/${id}`, { method: "PUT", body: JSON.stringify({ googleSheetId:updateInputRef.current.value}), headers: { "Content-Type": "application/json" } });
+            let API: any = await fetch(`/api/userSheets/${id}`, { method: "PUT", body: JSON.stringify({ googleSheetId: updateInputRef.current.value }), headers: { "Content-Type": "application/json" } });
             API = await API.json();
 
             if (API.success) {
@@ -132,9 +157,9 @@ const Sheets = () => {
 
             toast({ title: "Error", description: API.message });
         } catch (error) {
-            
+
         }
-        finally{
+        finally {
             setIsLoading(false);
         }
     }
@@ -156,6 +181,17 @@ const Sheets = () => {
             header: "Number of Orders",
             id: "orders",
             cell: ({ row }) => row?.original?.orders + " orders"
+        },
+
+        {
+            accessorKey: "enabled",
+            header: "Status",
+            id: "enabled",
+            cell: ({ row }) => {
+                return (
+                    <Badge className={row.original.enabled ? "bg-green-500" : "bg-red-500"}>{row.original.enabled ? "Enabled" : "Disabled"}</Badge>
+                )
+            }
         },
 
         {
@@ -201,40 +237,43 @@ const Sheets = () => {
                                 </AlertDialog>
 
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.push(`/dashboard/orders/${googleSheetId.googleSheetId}`)} className='cursor-pointer'>
+                            <DropdownMenuItem onClick={() => router.push(`/admin/orders/${googleSheetId.googleSheetId}`)} className='cursor-pointer'>
                                 See Orders
                             </DropdownMenuItem>
                             {
-                                googleSheetId.title === "No sheet added until now" ? <></> : <DropdownMenuItem onClick={() => disable(googleSheetId.googleSheetId, !googleSheetId.cronJobActive)} className=' cursor-pointer'>
+                                googleSheetId.title === "No sheet added until now" ? <></> : <DropdownMenuItem onClick={() => disable(googleSheetId.googleSheetId, !googleSheetId.cronJobActive,false)} className=' cursor-pointer'>
                                     {googleSheetId.cronJobActive ? "Disable Cron job" : "Enable Cron job"}
                                 </DropdownMenuItem>
                             }
-                                <Dialog>
-                            <DropdownMenuItem onClick={(e) => e.preventDefault()} className=' cursor-pointer'>
+
+                            <DropdownMenuItem onClick={() => disable(googleSheetId.googleSheetId, !googleSheetId.enabled, true)} className='cursor-pointer'>{googleSheetId.enabled ? "Disable Sheet" : "Enable Sheet"}</DropdownMenuItem>
+
+                            <Dialog>
+                                <DropdownMenuItem onClick={(e) => e.preventDefault()} className=' cursor-pointer'>
                                     <DialogTrigger asChild>
                                         <Button variant="outline">Edit Google Sheeet ID</Button>
                                     </DialogTrigger>
-                            </DropdownMenuItem>
-                                    <DialogContent className="sm:max-w-[425px]">
-                                        <DialogHeader>
-                                            <DialogTitle>Edit</DialogTitle>
-                                            <DialogDescription>
-                                                Make changes to your google sheet id here. Click save when you are don
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <div className="grid gap-4 py-4">
-                                            <div className="grid grid-cols-4 items-center gap-4">
-                        
-                                                <Input ref={updateInputRef} id="name" placeholder='Enter Google Sheet ID'  className="col-span-3" />
-                                            </div>
-                        
+                                </DropdownMenuItem>
+                                <DialogContent className="sm:max-w-[425px]">
+                                    <DialogHeader>
+                                        <DialogTitle>Edit</DialogTitle>
+                                        <DialogDescription>
+                                            Make changes to your google sheet id here. Click save when you are don
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-4 items-center gap-4">
+
+                                            <Input ref={updateInputRef} id="name" className="col-span-3" />
                                         </div>
-                                        <DialogFooter>
-                                            <Button onClick={()=>update(googleSheetId.googleSheetId)} type="submit">Save changes</Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
-                            
+
+                                    </div>
+                                    <DialogFooter>
+                                        <Button onClick={() => update(googleSheetId.googleSheetId)} type="submit">Save changes</Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+
                             <DropdownMenuSeparator />
                         </DropdownMenuContent>
                     </DropdownMenu>
