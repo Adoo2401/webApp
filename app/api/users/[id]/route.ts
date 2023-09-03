@@ -66,7 +66,7 @@ export async function GET(req: NextRequest,{params}:{params:Params}) {
         // Connect to the MongoDB database
         await mongoose.connect(process.env.MONGODB_URL!);
 
-        let user = await User.findById(params.id).select("role name email password");
+        let user = await User.findById(params.id).select("role name email password plan");
         if(!user) {return NextResponse.json({success:false,message:"User not found"},{status:500})}
         return NextResponse.json({ success: true, message:user});
 

@@ -14,61 +14,84 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { useEffect, useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
-import { Loader2 } from "lucide-react"
+import { Loader, Loader2 } from "lucide-react"
 
 
 type Params = {
-    id:string
+    id: string
 }
 
 
 
-function EditStripePrice({params}:{params:Params}) {
+function EditStripePrice({ params }: { params: Params }) {
 
     const [isLoading, setIsLoading] = useState(false);
-    const [isUserLoading,setIsUserLoading] = useState(true)
+    const [products, setProducts] = useState([]);
+    const [isProductLoading, setIsProductLoading] = useState(true);
+    const [isUserLoading, setIsUserLoading] = useState(true)
     const { toast } = useToast();
     const [data, setData] = useState<any>({});
 
-
-    async function fetchSingleUser(){
+    async function fetchSingleUser() {
         try {
-            
-            let API : any = await fetch(`/api/users/${params.id}`);
+
+            let API: any = await fetch(`/api/users/${params.id}`);
             API = await API.json();
 
-            if(API.success){
+            if (API.success) {
 
                 setData(API.message);
                 return setIsUserLoading(false);
             }
 
-            toast({title:"Error",description:API.message})
+            toast({ title: "Error", description: API.message })
 
 
-        } catch (error:any) {
-            toast({title:"Error",description:error.message})
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message })
         }
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         fetchSingleUser();
-    },[params])
-    
-    
+    }, [params])
 
-    function handleChange(e:any) {
+    async function fetchProducts() {
+
+        try {
+            setIsProductLoading(true);
+
+            let API: any = await fetch("/api/getProductNames");
+            API = await API.json();
+
+            if (API.success) {
+                setProducts(API.message);
+                setIsProductLoading(false);
+            }
+
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message })
+            setIsProductLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchProducts();
+    }, [])
+
+
+    function handleChange(e: any) {
         setData({ ...data, [e.target.name]: e.target.value })
     }
 
     async function handleEdit() {
 
-        if (!data.role || !data.name  || !data.email || !data.password) { return toast({ description: "Please add all fields" }) };
+        if (!data.role || !data.name || !data.email || !data.password) { return toast({ description: "Please add all fields" }) };
         setIsLoading(true)
 
         try {
 
-            let API : any= await fetch(`/api/users/${params.id}`, { method: "PUT", body: JSON.stringify(data), headers: { "Content-Type": "application/json" } });
+            let API: any = await fetch(`/api/users/${params.id}`, { method: "PUT", body: JSON.stringify(data), headers: { "Content-Type": "application/json" } });
             API = await API.json();
 
             if (API.success) {
@@ -81,17 +104,16 @@ function EditStripePrice({params}:{params:Params}) {
             toast({ title: "Error", description: API.message })
             setIsLoading(false);
 
-        } catch (error:any) {
+        } catch (error: any) {
             toast({ title: "Error", description: error.message })
             setIsLoading(false)
 
         }
     }
-
-    if(isUserLoading){
-        return(
+    if (isUserLoading) {
+        return (
             <div className="h-screen flex justify-center items-center">
-              <Loader2 className="animate-spin"/>
+                <Loader2 className="animate-spin" />
             </div>
         )
     }
@@ -109,9 +131,31 @@ function EditStripePrice({params}:{params:Params}) {
                 </CardHeader>
                 <CardContent className="grid gap-6">
                     <div className="grid grid-cols-2 gap-4">
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="area">Plan</Label>
+                            <Select defaultValue={data.plan} onValueChange={(value) => setData({ ...data, plan: value})}>
+                                <SelectTrigger className="line-clamp-1 w-[160px] truncate" id="area">
+                                    <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {
+                                        isProductLoading ? <Loader className="animate-spin" /> : products.map((product: any) => {
+                                            return (
+                                                <>
+                                                    <SelectItem value={product?.name?.toLowerCase()}>{product.name}</SelectItem>
+                                                </>
+                                            )
+                                        })
+                                    }
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="grid gap-2">
                             <Label htmlFor="role">Role</Label>
-                            <Select defaultValue={data.role} name="role" onValueChange={(e:string)=>setData({...data,role:e})}>
+                            <Select defaultValue={data.role} name="role" onValueChange={(e: string) => setData({ ...data, role: e })}>
                                 <SelectTrigger
                                     id="role"
                                     className="line-clamp-1 w-[160px] truncate"
@@ -128,10 +172,10 @@ function EditStripePrice({params}:{params:Params}) {
                             </Select>
                         </div>
                     </div>
-    
+
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name</Label>
-                        <Input value={data.name}  name="name" onChange={handleChange} id="name" placeholder="Full Name" />
+                        <Input value={data.name} name="name" onChange={handleChange} id="name" placeholder="Full Name" />
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>
