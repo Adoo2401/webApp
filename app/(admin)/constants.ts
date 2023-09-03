@@ -11,7 +11,7 @@ const routes = [
     {
         label:"Users",
         icon:User2,
-        href:"/admin/user",
+        href:"/admin/users",
         color:"#8b5cf6"
     },
     {
