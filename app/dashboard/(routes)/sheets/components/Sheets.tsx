@@ -219,7 +219,7 @@ const Sheets = () => {
                                         <DialogHeader>
                                             <DialogTitle>Edit</DialogTitle>
                                             <DialogDescription>
-                                                Make changes to your google sheet id here. Click save when you are don
+                                                Make changes to your google sheet id here. Click save when you are done
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="grid gap-4 py-4">

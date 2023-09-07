@@ -4,8 +4,10 @@ import React, { useEffect, useState } from 'react'
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable } from '@/components/ui/DataTable'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
+
 import { Button } from '@/components/ui/button'
-import { Loader, MoreHorizontal } from 'lucide-react'
+import { Loader, MoreHorizontal} from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
@@ -78,18 +80,18 @@ const Orders = ({params}:{params:Params}) => {
     }, [])
 
 
-    async function deleteProduct(id: string,product:string) {
+    async function deleteOrder(id: string) {
 
         setIsLoading(true)
         try {
 
-            let API: any = await fetch(`/api/cronJobs/${id}?productName=${product}`, { method: "DELETE" })
+            let API: any = await fetch(`/api/order/${id}`, { method: "DELETE" })
             API = await API.json();
 
             if (API.success) {
                 setIsLoading(false)
                 getData();
-                return toast({ title: "Success", description: "Cron Job Deleted" });
+                return toast({ title: "Success", description: "Order Deleted" });
             }
 
             toast({ title: "Error", description: API.message })
@@ -97,37 +99,6 @@ const Orders = ({params}:{params:Params}) => {
 
         } catch (error: any) {
             toast({ title: "Error", description: error.message })
-        }
-    }
-
-    async function disable(id: string, isEnabled: boolean) {
-
-        setIsLoading(true);
-        try {
-            let API: any = await fetch(`/api/cronJobs/${id}`, { method: "PATCH", body: JSON.stringify({ isEnabled: !isEnabled }), headers: { "Content-Type": "application/json" } });
-            API = await API.json();
-
-            if (API.success) {
-                toast({ title: "Success", description: API.message });
-
-                setData(data.map((item: any) => {
-                    if (item.jobId === id) {
-                        return { ...item, enabled: !isEnabled }
-                    }
-
-                    return item
-                }))
-
-                setIsLoading(false);
-                return
-            }
-
-            toast({ title: "Error", description: API.message });
-            setIsLoading(false);
-
-        } catch (error: any) {
-            toast({ title: "Error", description: error.message })
-            setIsLoading(false);
         }
     }
 
@@ -199,6 +170,49 @@ const Orders = ({params}:{params:Params}) => {
                 )
             }
         },
+        {
+            id: "actions",
+            cell: ({ row }) => {
+                const order: any = row.original
+                console.log(order);
+                return (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={(e) => e.preventDefault()} className='text-red-500 cursor-pointer'>
+                                <AlertDialog>
+                                    <AlertDialogTrigger>Delete</AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This action cannot be undone. This will permanently delete this order
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => deleteOrder(order._id)}>Continue</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={()=>router.push(`/admin/orders/edit_order/${order._id}`)}  className=' cursor-pointer'>
+                                Edit Order
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )
+            },
+        }
     ]
 
     return (

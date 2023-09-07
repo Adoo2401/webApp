@@ -128,7 +128,7 @@ export async function PUT(req: NextRequest,{params}:{params:Params}) {
 
         // Connect to the MongoDB database
         await mongoose.connect(process.env.MONGODB_URL!);
-
+        
         await Sheet.updateMany(
             {googleSheetId:params.id},
             {
@@ -137,6 +137,10 @@ export async function PUT(req: NextRequest,{params}:{params:Params}) {
         )
        
         let user = await User.findById(userId);
+        if(user.googleSheetIDs.includes(googleSheetId)) {
+            return NextResponse.json({ success: false, message: "Sheet already added" });
+        }
+
         if(user){
             const index = user.googleSheetIDs.indexOf(params.id);
             if(index!==-1){

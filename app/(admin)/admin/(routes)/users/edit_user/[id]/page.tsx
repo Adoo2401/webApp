@@ -23,7 +23,7 @@ type Params = {
 
 
 
-function EditStripePrice({ params }: { params: Params }) {
+function EditUser({ params }: { params: Params }) {
 
     const [isLoading, setIsLoading] = useState(false);
     const [products, setProducts] = useState([]);
@@ -198,4 +198,4 @@ function EditStripePrice({ params }: { params: Params }) {
     )
 }
 
-export default EditStripePrice
+export default EditUser
