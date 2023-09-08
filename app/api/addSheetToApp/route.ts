@@ -95,6 +95,31 @@ export async function POST(req: NextRequest, res: Response) {
       rowData['total'] = rowData["items"].reduce((a: number, b: any) => {
         return a + b.price
       }, 0)
+      const userSheet = await Sheet.findOne({userId,googleSheetId,sheetId});
+      let duplicateCheck = undefined;
+      
+      if(!userSheet){
+         duplicateCheck = data.find((item: any) => {
+          return (
+            item.userId === userId &&
+            item.source === rowData['source'] &&
+            item.phone === rowData['phone'] &&
+            item.fullName === rowData['fullName'] &&
+            item.googleSheetId === googleSheetId &&
+            item.sheetId === sheetId &&
+            item.items && 
+            item.items.some((products:any) => products.name === product)
+          );
+        });
+      }else{
+        duplicateCheck = await Sheet.findOne({userId,googleSheetId, sheetId,"items.name":product,phone:rowData['phone'],fullName:rowData['fullName'],source:rowData['source']});
+      }
+
+      if(duplicateCheck){
+        if(!userSheet?.duplicate){
+              continue
+        }
+      }
 
 
       data.push({ ...rowData, userId, googleSheetId, sheetId,idOnGoogleSheet,title });

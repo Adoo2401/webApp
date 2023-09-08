@@ -29,6 +29,7 @@ type UserSheets = {
     orders: number,
     cronJobActive: boolean,
     title: string
+    duplicate:boolean
 }
 
 
@@ -114,6 +115,34 @@ const Sheets = () => {
             setIsLoading(false);
         }
     }
+    async function updateDuplicate(id: string, duplicate: boolean) {
+        setIsLoading(true);
+        try {
+            let API: any = await fetch(`/api/userSheets/${id}`, { method: "POST", body: JSON.stringify({ duplicate: duplicate }), headers: { "Content-Type": "application/json" } });
+            API = await API.json();
+
+            if (API.success) {
+                toast({ title: "Success", description: API.message });
+
+                setData(data.map((item: any) => {
+                    if (item.googleSheetId === id) {
+                        return { ...item, duplicate: duplicate }
+                    }
+                    return item
+                }))
+
+                setIsLoading(false);
+                return
+            }
+
+            toast({ title: "Error", description: API.message });
+            setIsLoading(false);
+
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message })
+            setIsLoading(false);
+        }
+    }
 
     async function update(id:string){
          
@@ -169,6 +198,16 @@ const Sheets = () => {
             }
         },
         {
+            accessorKey: "duplicate",
+            header: "Allow Duplicate Orders",
+            cell: ({ row }) => {
+                if (row.original.title === "No sheet added until now") { return }
+                return (
+                    <Badge className={row.original.duplicate ? "bg-green-500" : "bg-red-500"}>{row.original.duplicate ? "Enabled" : "Disabled"}</Badge>
+                )
+            }
+        },
+        {
             id: "actions",
             cell: ({ row }) => {
                 const googleSheetId: any = row.original
@@ -210,6 +249,11 @@ const Sheets = () => {
                                 </DropdownMenuItem>
                             }
                                 <Dialog>
+                                {
+                                googleSheetId.title === "No sheet added until now" ? <></> : <DropdownMenuItem onClick={()=>updateDuplicate(googleSheetId.googleSheetId, !googleSheetId.duplicate)} className=' cursor-pointer'>
+                                    {googleSheetId.duplicate ? "Disable Duplicate" : "Enable Duplicate"}
+                                </DropdownMenuItem>
+                            }
                             <DropdownMenuItem onClick={(e) => e.preventDefault()} className=' cursor-pointer'>
                                     <DialogTrigger asChild>
                                         <Button variant="outline">Edit Google Sheeet ID</Button>

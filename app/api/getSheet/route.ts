@@ -73,7 +73,10 @@ export async function POST(req: NextRequest, res: Response) {
       if (!rowData["orderId"]) { return NextResponse.json({ success: false, message: "Order Id column not found and it is required make sure you have written it correct in google sheets" }, { status: 500 }); break; }
       
       let idOnGoogleSheet = row.get("order id") || row.get("Order ID") || row.get("order Id") || row.get("orderId") || row.get("OrderId");
+
       const orderId = await Sheet.findOne({ idOnGoogleSheet,userId,googleSheetId, sheetId });
+
+      
       if (orderId) {
         continue
       }
@@ -109,42 +112,70 @@ export async function POST(req: NextRequest, res: Response) {
         return a + b.price
       }, 0)
 
+      const userSheet = await Sheet.findOne({userId,googleSheetId,sheetId});
+      let duplicateCheck = undefined;
+      
+      if(!userSheet){
+         duplicateCheck = data.find((item: any) => {
+          return (
+            item.userId === userId &&
+            item.source === rowData['source'] &&
+            item.phone === rowData['phone'] &&
+            item.fullName === rowData['fullName'] &&
+            item.googleSheetId === googleSheetId &&
+            item.sheetId === sheetId &&
+            item.items && 
+            item.items.some((products:any) => products.name === product)
+          );
+        });
+      }else{
+        duplicateCheck = await Sheet.findOne({userId,googleSheetId, sheetId,"items.name":product,phone:rowData['phone'],fullName:rowData['fullName'],source:rowData['source']});
+      }
 
+      if(duplicateCheck){
+        if(!userSheet?.duplicate){
+              continue
+        }
+      }
+      
       data.push({ ...rowData, userId, googleSheetId, sheetId,idOnGoogleSheet,title });
     }
 
+    await Sheet.insertMany(data);
+    return NextResponse.json({success:true,message:"here"})
+
   
-    const promises = data.map(async (object: any) => {
-      const response = await fetch("https://api.codinafrica.com/api/orders/apicreate", { method: "POST", headers: { "Content-Type": "application/json;charset=utf-8", "x-auth-token": token }, body: JSON.stringify(object) });
-      return response.text();
-    });
+    // const promises = data.map(async (object: any) => {
+    //   const response = await fetch("https://api.codinafrica.com/api/orders/apicreate", { method: "POST", headers: { "Content-Type": "application/json;charset=utf-8", "x-auth-token": token }, body: JSON.stringify(object) });
+    //   return response.text();
+    // });
 
-    let responseMessage:any = {};
-    let responseStatus = {};
+    // let responseMessage:any = {};
+    // let responseStatus = {};
 
-    let results = await Promise.all(promises);
+    // let results = await Promise.all(promises);
     
-    for (let i = 0; i < results.length; i++) {
-      let check = JSON.parse(results[i]);
+    // for (let i = 0; i < results.length; i++) {
+    //   let check = JSON.parse(results[i]);
 
-      if (check?.content) {
-        responseMessage = { success: false, message: check?.content };
-        responseStatus = { status: 500 }
-        continue
-      }
-      responseMessage = { success: true, message: "Order Created Successfully" },
-      responseStatus = { status: 200 }
-    }
+    //   if (check?.content) {
+    //     responseMessage = { success: false, message: check?.content };
+    //     responseStatus = { status: 500 }
+    //     continue
+    //   }
+    //   responseMessage = { success: true, message: "Order Created Successfully" },
+    //   responseStatus = { status: 200 }
+    // }
 
 
-    if(responseMessage.success){
-      await Sheet.insertMany(data)
-      return NextResponse.json(responseMessage,responseStatus)
-    }
+    // if(responseMessage.success){
+    //   await Sheet.insertMany(data)
+    //   return NextResponse.json(responseMessage,responseStatus)
+    // }
 
-    if(results.length===0){
-      return NextResponse.json({success:true,message:"Everything is upto date"})
-    }
+    // if(results.length===0){
+    //   return NextResponse.json({success:true,message:"Everything is upto date"})
+    // }
 
 
   } catch (error: any) {

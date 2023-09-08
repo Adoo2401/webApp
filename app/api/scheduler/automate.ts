@@ -6,20 +6,20 @@ import Sheet from "../models/Sheet";
 
 
 async function automate(plan: string) {
-    
+
     await mongoose.connect(process.env.MONGODB_URL!);
-    
+
     let users = await User.find({ plan });
 
     for (let i = 0; i < users.length; i++) {
-       
+
         try {
             if (users[i].codeInAfricaApiKey && users[i].codeInAfricaSecretKey) {
 
-                let userAddedSheets = await Sheet.find({ userId: users[i]._id , isCronjobActive: true, enabled: true });
+                let userAddedSheets = await Sheet.find({ userId: users[i]._id, isCronjobActive: true, enabled: true });
 
                 for (let j = 0; j < userAddedSheets.length; j++) {
-                
+
 
                     try {
                         let currentGoogleSheetID = userAddedSheets[j].googleSheetId;
@@ -47,7 +47,7 @@ async function automate(plan: string) {
 
                         let offset = 0;
                         offset = (await Sheet.find({ userId: users[i]._id, googleSheetId: userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId })).length;
-                        
+
                         const highestOrderPrefix = await Sheet.aggregate([
                             {
                                 $project: {
@@ -91,7 +91,7 @@ async function automate(plan: string) {
                             rowData["orderId"] = row.get("order id") || row.get("Order ID") || row.get("order Id") || row.get("orderId") || row.get("OrderId");
 
                             let idOnGoogleSheet = row.get("order id") || row.get("Order ID") || row.get("order Id") || row.get("orderId") || row.get("OrderId");
-                            const orderId = await Sheet.findOne({ idOnGoogleSheet, userId:users[i]._id, googleSheetId:userAddedSheets[j].googleSheetId,sheetId:userAddedSheets[j].sheetId});
+                            const orderId = await Sheet.findOne({ idOnGoogleSheet, userId: users[i]._id, googleSheetId: userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId });
                             if (orderId) {
                                 continue
                             }
@@ -121,11 +121,37 @@ async function automate(plan: string) {
                                 return a + b.price
                             }, 0)
 
+                            const userSheet = await Sheet.findOne({ userId:currentUserID, googleSheetId:userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId });
+                            let duplicateCheck = undefined;
 
-                            data.push({ ...rowData,idOnGoogleSheet, userId: users[i]._id, googleSheetId: userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId });
+                            if (!userSheet) {
+                                duplicateCheck = data.find((item: any) => {
+                                    return (
+                                        item.userId === currentUserID &&
+                                        item.source === rowData['source'] &&
+                                        item.phone === rowData['phone'] &&
+                                        item.fullName === rowData['fullName'] &&
+                                        item.googleSheetId === userAddedSheets[j].googleSheetId &&
+                                        item.sheetId === userAddedSheets[j].sheetId &&
+                                        item.items &&
+                                        item.items.some((products: any) => products.name ===items[0].name )
+                                    );
+                                });
+                            } else {
+                                duplicateCheck = await Sheet.findOne({ userId:currentUserID, googleSheetId:userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId, "items.name":items[0].name, phone: rowData['phone'], fullName: rowData['fullName'], source: rowData['source'] });
+                            }
+
+                            if (duplicateCheck) {
+                                if (!userSheet?.duplicate) {
+                                    continue
+                                }
+                            }
+
+
+                            data.push({ ...rowData, idOnGoogleSheet, userId: users[i]._id, googleSheetId: userAddedSheets[j].googleSheetId, sheetId: userAddedSheets[j].sheetId });
 
                         }
-                        
+
                         const promises = data.map(async (object: any) => {
                             const response = await fetch("https://api.codinafrica.com/api/orders/apicreate", { cache: "no-store", method: "POST", headers: { "Content-Type": "application/json;charset=utf-8", "x-auth-token": token.content.token }, body: JSON.stringify(object) });
                             return response.text();

@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
         if (user.googleSheetIDs) {
             for (let i = 0; i < user?.googleSheetIDs.length; i++) {
                 let sheets = await Sheet.find({ googleSheetId: user?.googleSheetIDs[i]});
-               resp.push({ enabled:sheets[0]?.enabled,googleSheetId: user?.googleSheetIDs[i], orders: sheets.length, cronJobActive: sheets[0]?.isCronjobActive || null, title: sheets[0]?.title || "No sheet added until now"});
+               resp.push({ duplicate:sheets[0]?.duplicate || null,enabled:sheets[0]?.enabled,googleSheetId: user?.googleSheetIDs[i], orders: sheets.length, cronJobActive: sheets[0]?.isCronjobActive || null, title: sheets[0]?.title || "No sheet added until now"});
                 
             }
         }
