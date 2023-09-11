@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
 
 
         const body = await request.text();
-        console.log("🚀 ~ file: route.ts:16 ~ POST ~ body:", body)
         const secret = process.env.LEMON_WEBHOOK_SECRET!;
         const hmac = crypto.createHmac('sha256', secret);
         const digest = Buffer.from(hmac.update(body).digest('hex'), 'utf8');
@@ -27,9 +26,8 @@ export async function POST(request: NextRequest) {
         }
 
         const webhook = JSON.parse(body);
-        console.log("🚀 ~ file: route.ts:30 ~ POST ~ webhook:", webhook)
         
-
+    
         if(webhook?.meta?.event_name==="subscription_created"){
 
             let plan = webhook?.meta?.custom_data?.plan;
@@ -37,7 +35,7 @@ export async function POST(request: NextRequest) {
 
             await User.findByIdAndUpdate(userId,{
                 payment:"lemon",
-                name:plan,
+                plan,
                 lemonProductId:webhook?.data?.attributes?.product_id,
                 lemonVariantId:webhook?.data?.attributes?.variant_id,
                 lemonUpdateSubscriptionUrl:webhook?.data?.attributes?.urls?.update_payment_method,
@@ -48,8 +46,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({success:true,message:"Webhook received"})
 
     } catch (error: any) {
-
-        console.log(error);
         return NextResponse.json({ success: false, message: error.message},{status:500})
     }
 }
