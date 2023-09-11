@@ -10,15 +10,17 @@ import User from '../../models/User';
 export async function POST(request: NextRequest) {
     try {
 
+        const body = await request.text();
 
         const secret = process.env.LEMON_WEBHOOK_SECRET!;
         const hmac = crypto.createHmac('sha256', secret);
-        const digest = Buffer.from(hmac.update(JSON.stringify(request.body!)).digest('hex'), 'utf8');
+        const digest = Buffer.from(hmac.update(body).digest('hex'), 'utf8');
         console.log("🚀 ~ file: route.ts:17 ~ POST ~ digest:", digest)
         const signature = Buffer.from(request.headers.get('X-Signature') || '', 'utf8');
         console.log("🚀 ~ file: route.ts:19 ~ POST ~ signature:", signature)
 
         if (!crypto.timingSafeEqual(digest, signature)) {
+            console.log("reutrn unauthoried")
             return NextResponse.json({success:false,message:"Unauthorized"},{status:401})
         }
 
