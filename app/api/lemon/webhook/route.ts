@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({success:false,message:"Unauthorized"},{status:401})
         }
 
-        const webhook = await request.json();
+        const webhook = JSON.parse(body);
         console.log("🚀 ~ file: route.ts:30 ~ POST ~ webhook:", webhook)
         
 
