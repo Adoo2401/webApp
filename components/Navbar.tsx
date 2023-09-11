@@ -8,7 +8,7 @@ import { ArrowBigRight } from 'lucide-react'
 import PricingList from './PricingList'
 import { useSession } from 'next-auth/react'
 
-const Navbar = async ({ isHome }: { isHome: boolean }) => {
+const Navbar = ({ isHome }: { isHome: boolean }) => {
 
   const {data:session,status} = useSession();
   if(status=="loading"){return}
