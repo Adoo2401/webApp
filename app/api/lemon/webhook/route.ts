@@ -4,20 +4,21 @@ import crypto from 'crypto'
 import { decode } from 'next-auth/jwt';
 import { absoluteUrl } from '@/app/utils/utils';
 import User from '../../models/User';
+import {headers} from 'next/headers'
 
 
 
 export async function POST(request: NextRequest) {
     try {
 
-        const body = await request.text();
 
-        const secret = process.env.LEMON_WEBHOOK_SECRET!;
+        const body = await request.text();
+        const secret = "test";
         const hmac = crypto.createHmac('sha256', secret);
         const digest = Buffer.from(hmac.update(body).digest('hex'), 'utf8');
-        console.log("🚀 ~ file: route.ts:17 ~ POST ~ digest:", digest)
-        const signature = Buffer.from(request.headers.get('X-Signature') || '', 'utf8');
-        console.log("🚀 ~ file: route.ts:19 ~ POST ~ signature:", signature)
+        const signature = Buffer.from(headers().get("X-Signature") || '', 'utf8');
+
+        
 
         if (!crypto.timingSafeEqual(digest, signature)) {
             console.log("reutrn unauthoried")
@@ -25,7 +26,6 @@ export async function POST(request: NextRequest) {
         }
 
         const webhook = await request.json();
-        console.log(webhook);
 
         if(webhook.meta.event_name==="subscription_created"){
 
@@ -47,6 +47,13 @@ export async function POST(request: NextRequest) {
     } catch (error: any) {
 
         console.log(error);
-        return NextResponse.json({ success: false, message: error.message,status:500 })
+        return NextResponse.json({ success: false, message: error.message},{status:500})
     }
 }
+
+
+export const config = {
+    api: {
+      bodyParser: false,
+    },
+  };
