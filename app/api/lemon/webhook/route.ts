@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         const digest = Buffer.from(hmac.update(body).digest('hex'), 'utf8');
         const signature = Buffer.from(headers().get("X-Signature") || '', 'utf8');
 
-        
+
 
         if (!crypto.timingSafeEqual(digest, signature)) {
             console.log("reutrn unauthoried")
