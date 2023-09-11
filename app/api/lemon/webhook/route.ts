@@ -13,7 +13,8 @@ export async function POST(request: NextRequest) {
 
 
         const body = await request.text();
-        const secret = "test";
+        console.log("🚀 ~ file: route.ts:16 ~ POST ~ body:", body)
+        const secret = process.env.LEMON_WEBHOOK_SECRET!;
         const hmac = crypto.createHmac('sha256', secret);
         const digest = Buffer.from(hmac.update(body).digest('hex'), 'utf8');
         const signature = Buffer.from(headers().get("X-Signature") || '', 'utf8');
@@ -26,8 +27,10 @@ export async function POST(request: NextRequest) {
         }
 
         const webhook = await request.json();
+        console.log("🚀 ~ file: route.ts:30 ~ POST ~ webhook:", webhook)
+        
 
-        if(webhook.meta.event_name==="subscription_created"){
+        if(webhook?.meta?.event_name==="subscription_created"){
 
             let plan = webhook?.meta?.custom_data?.plan;
             let userId = webhook?.meta?.custom_data?.userId
