@@ -17,7 +17,6 @@ export async function POST(req){
     try {
         event = stripe.webhooks.constructEvent(body,signature,process.env.STRIPE_WEBHOOK_SECRET);
     } catch (error) {
-        console.log(error);
         return NextResponse.json({success:false,message:`Webhook Error ___ ${error.message}`},{status:400})
     }
 
@@ -46,7 +45,7 @@ export async function POST(req){
         })
         
 
-        await User.findByIdAndUpdate(session.metadata.userId,{stripeCustomerId:subscription.customer,stripeSubscriptionId:subscription.id,stripePriceId:subscription.items.data[0].plan.id,stripeCurrentPeriodEnd:new Date(subscription.current_period_end * 1000),plan:chosenTier.name})
+        await User.findByIdAndUpdate(session.metadata.userId,{stripeCustomerId:subscription.customer,stripeSubscriptionId:subscription.id,stripePriceId:subscription.items.data[0].plan.id,stripeCurrentPeriodEnd:new Date(subscription.current_period_end * 1000),plan:chosenTier.name,paymentGateway:"stripe"})
     }
 
     if(event.type=="customer.subscription.updated"){
@@ -68,6 +67,7 @@ export async function POST(req){
             stripePriceId:subscription.items.data[0].plan.id,
             stripeCurrentPeriodEnd:new Date(subscription.current_period_end * 1000),
             plan:subscription?.plan?.active?chosenTier.name:"none",
+            paymentGateway:"stripe"
 
         })
     }
@@ -79,7 +79,8 @@ export async function POST(req){
             stripeCurrentPeriodEnd:null,
             plan:"none",
             stripeCurrentPeriodEnd:null,
-            stripeSubscriptionId:null
+            stripeSubscriptionId:null,
+            paymentGateway:null
         })
     }
 
@@ -98,13 +99,12 @@ export async function POST(req){
                 }
             }
         })
-        console.log("🚀 ~ file: route.js:104 ~ POST ~ chosenTier:", chosenTier)
-      
-        
+              
         await User.updateOne({stripeSubscriptionId:subscription.id},{
             stripePriceId:subscription.items.data[0].plan.id,
             stripeCurrentPeriodEnd:new Date(subscription.current_period_end * 1000),
             plan:chosenTier.name,
+            paymentGateway:"stripe"
 
         })
 

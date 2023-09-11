@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     password:String,
     role:{type:String,required:true,default:"user"},
     plan:{type:String,required:true,default:"none"},
-    paymentGateway:{type:String,enum:['stripe',"youcanpay"]},
+    paymentGateway:{type:String,enum:['stripe',"lemon"]},
     stripeCustomerId:{type:String},
     stripeSubscriptionId:{type:String},
     stripePriceId:{type:String},
@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema({
     cronJobIsActive:{type:Boolean},
     googleSheetIDs:[],
     sheetIDs:[],
+    lemonProductId:{type:String},
+    lemonVariantId:String,
+    lemonUpdateSubscriptionUrl:String,
+    lemonCurrentPeriodEnd:{type:Date}
 
 },{timestamps:true})
 

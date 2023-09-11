@@ -1,14 +1,8 @@
-
+"use client"
 
 import Navbar from '@/components/Navbar'
 import PricingComponent from './PricingComponent'
 
-type Params = {
-  searchParams: URLSearchParams,
-  params: {
-    id:string | undefined
-  }
-}
 
 const page = () => {
 

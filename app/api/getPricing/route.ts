@@ -24,7 +24,7 @@ export async function GET (req:NextRequest){
 
              if(prices){
                let activePrices = prices.prices.filter((price:any)=>price.active===true);
-               response.push({name:productsNames[i].name,prices:activePrices,description:productsNames[i].description})
+               response.push({name:productsNames[i].name,prices:activePrices,description:productsNames[i].description,})
              }
 
         }

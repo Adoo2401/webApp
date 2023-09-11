@@ -1,13 +1,17 @@
+"use client"
 import Link from 'next/link'
 import React from 'react'
 import MobileSidebar from './MobileNavbar'
 import { cn } from '@/lib/utils'
 import { getServerSession } from 'next-auth'
 import { ArrowBigRight } from 'lucide-react'
+import PricingList from './PricingList'
+import { useSession } from 'next-auth/react'
 
 const Navbar = async ({ isHome }: { isHome: boolean }) => {
 
-  const session = await getServerSession();
+  const {data:session,status} = useSession();
+  if(status=="loading"){return}
   
 
   return (
@@ -18,7 +22,7 @@ const Navbar = async ({ isHome }: { isHome: boolean }) => {
         </div>
         <MobileSidebar isHome={isHome} />
         <div className={cn("md:flex items-center space-x-5 hidden text-red",isHome?"text-white":"text-black")}>
-          <Link href={"/pricing"}>Pricing</Link>
+          <PricingList/>
           <Link href={"/contact"}>Contact Us</Link>
           <Link href={"/about"}>About Us</Link>
           {
