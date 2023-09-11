@@ -10,11 +10,10 @@ import User from '../../models/User';
 export async function POST(request: NextRequest) {
     try {
 
-        const crypto = require('crypto');
 
-        const secret = process.env.LEMON_WEBHOOK_SECRET;
+        const secret = process.env.LEMON_WEBHOOK_SECRET!;
         const hmac = crypto.createHmac('sha256', secret);
-        const digest = Buffer.from(hmac.update(request.body).digest('hex'), 'utf8');
+        const digest = Buffer.from(hmac.update(JSON.stringify(request.body!)).digest('hex'), 'utf8');
         console.log("🚀 ~ file: route.ts:17 ~ POST ~ digest:", digest)
         const signature = Buffer.from(request.headers.get('X-Signature') || '', 'utf8');
         console.log("🚀 ~ file: route.ts:19 ~ POST ~ signature:", signature)
