@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
                 plan,
                 lemonProductId:webhook?.data?.attributes?.product_id,
                 lemonVariantId:webhook?.data?.attributes?.variant_id,
-                lemonUpdateSubscriptionUrl:webhook?.data?.attributes?.urls?.update_payment_method,
+                lemonSubscriptionId:webhook?.data?.attributes?.first_subscription_item?.subscription_id,
                 lemonCurrentPeriodEnd:new Date(webhook?.data?.attributes?.renews_at)
             })
         }

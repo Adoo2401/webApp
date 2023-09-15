@@ -25,20 +25,32 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({success:true,message:"user not found"});
         }
 
+        if(user.paymentGateway==="stripe"){
+            return NextResponse.json({success:true,message:"You are already on stripe plan"});
+        }
+
         const body = await req.json();
         const {plan,variantId} = body;
 
         if(!plan || !variantId){return NextResponse.json({success:false,message:"Invalid Data"})}
 
+        const headers = {
+            "Content-Type": "application/vnd.api+json",
+            "Accept": "application/vnd.api+json",
+            "Authorization": `Bearer ${process.env.LEMON_API_KEY}`
+        }
+
+        // // Handling plan change or cancell here
+        // if(user.lemonSubscriptionId){
+        //   let lemonChangePlanUrl = "https://api.lemonsqueezy.com/v1/subscriptions";
+        //   await fetch()
+        // }
+
         const lemonUrl = "https://api.lemonsqueezy.com/v1/checkouts";
     
         const Api = await fetch(lemonUrl, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/vnd.api+json",
-                "Accept": "application/vnd.api+json",
-                "Authorization": `Bearer ${process.env.LEMON_API_KEY}`
-            },
+            headers,
             body: JSON.stringify({
                 data: {
                     type: "checkouts",
@@ -68,7 +80,7 @@ export async function POST(req: NextRequest) {
 
                         variant: {
                             data: {
-                                type: "variants",
+                                type:"variants",
                                 id: variantId,
                             }
                         }
@@ -78,10 +90,10 @@ export async function POST(req: NextRequest) {
         })
 
 
-        let {data} = await Api.json();
-
-        if (data?.attributes?.url) {
-            return NextResponse.json({ success: true, message: data.attributes.url });
+        let lemon = await Api.json();
+      
+        if (lemon?.data?.attributes?.url) {
+            return NextResponse.json({ success: true, message: lemon?.data.attributes.url });
         }
 
         return NextResponse.json({ success: false, message: "Something went wrong" });
@@ -89,6 +101,7 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
 
+        console.log(error);
         return NextResponse.json({ success: false, message: error.message })
     }
 }

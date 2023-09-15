@@ -10,6 +10,7 @@ import { useToast } from "./ui/use-toast";
 import { useRouter } from "next/navigation"
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import PricingList from "./PricingList";
 
 
 
@@ -74,6 +75,7 @@ const MobileSidebar = ({isHome}:{isHome:boolean}) => {
                     <Link href={"/pricing"}>Pricing</Link>
                     <Link href={"/contact"}>Contact Us</Link>
                     <Link href={"/about"}>About Us</Link>
+                    <PricingList/>
                     {
             session?.user ? (
               <Link

@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     sheetIDs:[],
     lemonProductId:{type:String},
     lemonVariantId:String,
-    lemonUpdateSubscriptionUrl:String,
+    lemonSubscriptionId:String,
     lemonCurrentPeriodEnd:{type:Date}
 
 },{timestamps:true})
